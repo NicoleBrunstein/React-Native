@@ -1,0 +1,49 @@
+.ygtvlabel
+{
+	color: black;
+	text-decoration: none;
+	background: transparent!important;
+	vertical-align: bottom;
+}
+.ygtvlabelSelected
+{
+	color: white!important;
+	background: #3A6EA5!important;
+}
+.mbt
+{
+	/*margin-bottom: 15px;*/
+}
+.tblPerm
+{
+	border: 1px solid #000000;
+	border-spacing: 0px;
+	border-collapse: collapse;
+}
+.tblPerm td
+{
+	padding: 3px;
+}
+.permHd
+{
+	background: #D4D0C8;
+}
+tr.userSelected
+{
+	color: white;
+	background: #3A6EA5;
+}
+.ygtvlabel
+{
+	/*top: 3px;
+	padding-left: 2px;*/
+}
+.noprincipal .ygtvlabel
+{
+
+}
+.principal .ygtvlabel
+{
+	font-weight: bold;
+	color: #444;
+}

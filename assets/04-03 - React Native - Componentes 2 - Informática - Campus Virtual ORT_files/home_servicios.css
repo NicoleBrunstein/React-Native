@@ -1,0 +1,284 @@
+/***************************    INICIO HOME SERVICIOS *********************************/
+div.contieneNoticia
+{
+	width: auto;
+	background: #f2f2f2;
+	padding: 17px;
+    overflow: hidden;
+}
+div.contieneNoticiaEstadisticas
+{
+	padding-bottom: 100px;
+}
+div.contieneNoticia .row{
+    margin-bottom:5px;
+}
+
+div.contieneContenidos
+{
+	width: auto;
+	background: #f2f2f2;
+	padding-left: 17px;
+	padding-right: 17px;
+	padding-bottom: 17px;
+}
+div.categoriasHomeServicios {
+    padding-top: 0; 
+    margin-bottom: 10px;
+}
+.card .card-action{
+	/*z-index: 0;*/
+}
+div.contenidoHomeServiciosActions
+{
+	position: relative;
+    top: 35px;
+	left: 750px;
+}
+.tituloRssHome
+{
+    position:relative;
+    float:right;
+    display:inline;
+    right: 25px;
+    width:690px;
+    font-size:15px;
+	text-align:center;
+	font-family:verdana;
+	font-weight:bold;
+}
+div.contieneRss
+{
+	width: auto;
+	height: 550px;
+	background: #f2f2f2;
+	padding: 1px;
+}
+
+div.volantaHomeServicio
+{
+	font-weight: bold;
+	padding-bottom: 5px;
+	color: #fff;
+}
+
+div.headerRss
+{
+	margin-top:8px;
+	padding-top:10px;
+	padding-bottom:10px;
+	background-color:#f2f2f2;
+}
+
+div.copeteHomeServicios
+{
+	color: #0064b2;
+	font-size: 12px;
+	font-weight: bold;
+	width: 100%;
+	padding-top: 17px;
+	padding-bottom: 2px;
+}
+
+div.copeteHomeServicios a
+{
+	color: #0064b2;
+	font-weight: bold;
+	width: 100%;
+	padding-top: 17px;
+	padding-bottom: 2px;
+}
+
+div.copeteHomeServicios a h2
+{
+	font-size: 12px;
+}
+
+div.contieneCuerpoImagen
+{
+	width: 100%;
+	overflow: hidden;
+}
+
+div.imagenHomeServicios
+{
+	float: left;
+	width: 315px;
+}
+
+div.textoHomeServicios
+{
+	float: left;
+	color: #626262;
+}
+
+div.propVideoHome
+{
+	margin-left: 15px;
+	float: left;
+	color: #555;
+}
+
+.embedCode
+{
+	width: 100% !important;
+	font-size: 11px !important;
+	color: #555;
+}
+
+div.textoHomeServicios a
+{
+	color: #000;
+}
+
+div.categoriasHomeServicios
+{
+	/*padding-top: 30px;*/
+}
+
+div.categoriasHomeServiciosAlt
+{
+	padding-top: 0;
+	margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+div.columnaTituloHomeServicios
+{
+	padding-left: 17px;
+    z-index: 0;
+}
+
+div.categoriasRow
+{
+	overflow: auto;
+	/*height: 20px;*/
+	height: auto;
+}
+
+div.categoriasRow div.categoriasItem
+{
+	float: left;
+	/*width: 264px;*/
+	/*height: 20px;*/
+	height: auto;
+}
+
+div.categoriasItem img
+{
+	margin-right: 10px;
+}
+
+a.tituloUltimasNoticias
+{
+	/*color: #0064b2;
+	font-weight: bold;*/
+}
+
+a.tituloUltimasNoticias h2
+{
+	font-size: 16px;
+    margin: 0;
+    /*margin-left: 25px;*/
+    margin-bottom: 10px;
+    line-height: 18px;
+}
+
+a.tituloUltimasNoticias span
+{
+	font-size: 16px;
+}
+
+div.copeteUltimasNoticias
+{
+	/*color: #555555;
+	font-size: 11px;
+	padding-bottom: 10px;
+	padding-top: 5px;*/
+}
+
+div.copeteUltimasNoticiasDestacado
+{
+	color: #555555;
+	font-size: 11px;
+	padding-bottom: 10px;
+	padding-top: 5px;
+	font-weight: bold;
+}
+
+div.datUltimNoti
+{
+	/*float:left;
+	font-weight:normal;
+	font-weight:bold;
+	color:#555555;
+	padding:0 0 15px 0;*/
+    font-size:14px;
+    margin-top: 5px;
+}
+span.txtDatUltNoti
+{
+	font-weight:normal;
+	font-size:14px;
+}
+
+.datUltimNoti a
+{
+	color: #555555;
+}
+
+span.sepTxtDatUltNoti
+{
+	padding:0 13px 0 13px;
+	font-weight:normal;
+	font-size:11px;
+}
+div.datUltimHtml
+{
+	float:left;
+	font-weight:normal;
+	font-size:11px;
+	font-weight:bold;
+	color:#555555;
+	padding:0 0 0 0;
+}
+div.copeteUltimasHtmls
+{
+	color: #555555;
+	font-size: 11px;
+	padding-bottom: 3px;
+	padding-top: 5px;
+	width:700px;
+}
+.inpUrlEmbedCode
+{
+	border:1px solid #307eaf;
+	font-family: verdana;
+	font-size:11px;
+	color:#777777;
+	width:100%;
+	height:14px;
+	padding:0 0 0 4px;
+}
+div.contEmbCod
+{
+	width:806px;
+	border:1px solid #fff;
+	margin:10px 0 0 0;
+	padding:9px 16px 11px 16px;
+	font-family:verdana;
+	font-weight:bold;
+	font-size:12px;
+	color:#fff;
+}
+div.contEmbCod input
+{
+	padding:2px 0 3px 5px;
+	margin:10px 0 0 0;
+	border:1px solid #086da0;
+	font-family:verdana;
+	font-size:11px;
+	color:#626262;
+	width:100%;
+}
+/***************************    FIN HOME SERVICIOS 	  *********************************/

@@ -1,0 +1,249 @@
+var DomGet = YAHOO.util.Dom.get;
+
+var AutCompOrt =
+{
+	init: function(sIdInpSearch, sContAutCom, btnCarga)
+	{
+		AutCompOrt.idInpSearch = sIdInpSearch;
+		AutCompOrt.txtDefaultSearch = DomGet(sIdInpSearch).value;
+		AutCompOrt.idContAutCom = sContAutCom;
+		AutCompOrt.lsJer = false;
+		AutCompOrt.inProgress = false;
+        AutCompOrt.btnBuscarJer = btnCarga;
+
+		//YAHOO.util.Event.addListener(AutCompOrt.idInpSearch, "focus", AutCompOrt.reqJerBd);
+        //YAHOO.util.Event.addListener(AutCompOrt.idInpSearch, "click", AutCompOrt.reqJerBd);
+        //YAHOO.util.Event.addListener(AutCompOrt.idInpSearch, "touchstart", AutCompOrt.reqJerBd);
+        //YAHOO.util.Event.addListener(AutCompOrt.btnBuscarJer, "click", AutCompOrt.reqJerBd);
+        //YAHOO.util.Event.addListener(AutCompOrt.btnBuscarJer, "touchstart", AutCompOrt.reqJerBd);
+		
+		var el = document.getElementById(btnCarga);
+		el.addEventListener("click", AutCompOrt.reqJerBd);
+		el.addEventListener("touchstart", AutCompOrt.reqJerBd);
+	},
+
+	setLsJer: function(p)
+	{
+		AutCompOrt.lsJer = p;
+	},
+
+	getLsJer: function(p)
+	{
+		return AutCompOrt.lsJer;
+	},
+
+	validLsJer: function(p)
+	{
+		if(AutCompOrt.lsJer !== false)
+		{
+			return true;
+		}
+		return false;
+	},
+
+	reqJerBd: function()
+	{
+		if(DomGet(AutCompOrt.idInpSearch).value == AutCompOrt.txtDefaultSearch)
+		{
+			DomGet(AutCompOrt.idInpSearch).value = '';
+		}
+
+		if(AutCompOrt.lsJer === false)
+		{
+			if(AutCompOrt.inProgress === false)
+			{
+				AutCompOrt.inProgress = true;
+
+				var handleSuccess = function(o)
+				{
+					if(o.responseText !== undefined)
+					{
+						try
+						{
+							//AutCompOrt.lsJer = o.responseText.parseJSON();
+							AutCompOrt.lsJer = YAHOO.lang.JSON.parse(o.responseText);
+						}
+						catch(e)
+						{
+							AutCompOrt.lsJer = false;
+						}
+
+						if(AutCompOrt.lsJer != false)
+						{
+							AutCompOrt.inProgress = false;
+							AutCompOrt.activeAutoComp();
+						}
+					}
+				};
+
+				var handleFailure = function(o) { AutCompOrt.arrJer = false; AutCompOrt.inProgress = false;};
+
+				var callback = {success:handleSuccess, failure:handleFailure};
+                
+				YAHOO.util.Connect.asyncRequest('POST', '/ajaxactions/GetListToSuggestMenu', callback, 'id=0');
+			}
+		}
+
+		return false;
+	},
+
+	activeAutoComp: function()
+	{
+		if(AutCompOrt.validLsJer())
+		{
+			DomGet(AutCompOrt.idInpSearch).focus();
+
+			var listJer = AutCompOrt.getLsJer();
+
+			// Define a custom search function for the DataSource
+			var matchNames = function(sQuery)
+			{
+				var query = sQuery.toLowerCase(),
+				queryAlt = sQuery.toLowerCase(),
+				queryOpc = sQuery.toLowerCase(),
+				contact,
+				i=0,
+				l=listJer.length,
+				matches = [],
+				regOrg = '',
+				regOpc = '';
+
+				// Codifico los caracteres especiales
+				query = query.replace(/%20/g,' ');
+				query = query.replace(/%c3%b1/g,'ñ');
+				query = query.replace(/%c3%a1/g,'á');
+				query = query.replace(/%c3%a9/g,'é');
+				query = query.replace(/%c3%ad/g,'í');
+				query = query.replace(/%c3%b3/g,'ó');
+				query = query.replace(/%c3%ba/g,'ú');
+
+
+				// Matcheo para palabras con y sin tildes
+				queryAlt = queryAlt.replace(/%20/g,' ');
+				queryAlt = queryAlt.replace(/%c3%b1/g,'ñ');
+				queryAlt = queryAlt.replace(/%c3%a1/g,'a');
+				queryAlt = queryAlt.replace(/%c3%a9/g,'e');
+				queryAlt = queryAlt.replace(/%c3%ad/g,'i');
+				queryAlt = queryAlt.replace(/%c3%b3/g,'o');
+				queryAlt = queryAlt.replace(/%c3%ba/g,'u');
+
+
+				// Matcheo para palabras con y sin tildes
+				queryOpc = queryOpc.replace(/%20/g,' ');
+				queryOpc = queryOpc.replace(/ñ/g,'ñ');
+				queryOpc = queryOpc.replace(/a/g,'á');
+				queryOpc = queryOpc.replace(/e/g,'é');
+				queryOpc = queryOpc.replace(/i/g,'í');
+				queryOpc = queryOpc.replace(/o/g,'ó');
+				queryOpc = queryOpc.replace(/u/g,'ú');
+
+				// Matche con cada unos de los registros
+				for(; i<l; i++)
+				{
+					contact = listJer[i];
+
+					regOrg = contact.n.toLowerCase();
+
+					regOpc = contact.n.toLowerCase();
+					regOpc = regOpc.replace(/á/g,'a');
+					regOpc = regOpc.replace(/é/g,'e');
+					regOpc = regOpc.replace(/í/g,'i');
+					regOpc = regOpc.replace(/ó/g,'o');
+					regOpc = regOpc.replace(/ú/g,'u');
+					
+					if(regOrg.indexOf(query) > -1 || regOrg.indexOf(queryAlt) > -1 || regOrg.indexOf(queryOpc) > -1 || regOpc.indexOf(queryAlt) > -1)
+					{
+						matches[matches.length] = contact;
+					}
+				}
+
+				return matches;
+			};
+
+			// Use a FunctionDataSource
+			var oDS = new YAHOO.util.FunctionDataSource(matchNames);
+
+			oDS.responseSchema =
+			{
+				fields: ["s", "n", "u"]
+			}
+
+			// Instantiate AutoComplete
+			var oAC = new YAHOO.widget.AutoComplete(AutCompOrt.idInpSearch, AutCompOrt.idContAutCom, oDS);
+			oAC.resultTypeList = false;
+			oAC.highlightClassName = 'bgSugAutComp';
+			oAC.prehighlightClassName = 'bgSobSugAutComp';
+			oAC.useShadow = true;
+			oAC.queryDelay = 0;
+			oAC.autoHighlight = true;
+			oAC.minQueryLength = 1;
+			//oAC.maxResultsDisplayed = 20;
+            oAC.maxResultsDisplayed = 10;
+            
+			var myHandler = function(sType, aArgs)
+			{
+				try
+				{
+					window.location = 'http://' + aArgs[2].u;
+				}
+				catch(e){}
+			};
+			oAC.itemSelectEvent.subscribe(myHandler);
+
+			// Custom formatter to highlight the matching letters
+			oAC.formatResult = function(oResultData, sQuery, sResultMatch)
+			{
+				var query = sQuery.toLowerCase(),
+				n = oResultData.n,
+				s = oResultData.s,
+				query = sQuery.toLowerCase(),
+				nMatchIndex = n.toLowerCase().indexOf(query),
+				displayn;
+
+				if(nMatchIndex > -1)
+				{
+					displayn = highlightMatch(n, query, nMatchIndex, (s != '' ? s +' | ' : ''));
+				}
+				else
+				{
+					displayn = (s != '' ? s +' | ' : '')+n;
+				}
+
+				return displayn;
+
+			};
+
+			// Helper function for the formatter
+			var highlightMatch = function(full, snippet, matchindex, prefix)
+			{
+				return prefix+full.substring(0, matchindex) +
+				"<span class='match'>" +
+				full.substr(matchindex, snippet.length) +
+				"</span>" +
+				full.substring(matchindex + snippet.length);
+			};
+
+			// Define an event handler to populate a hidden form field
+			// when an item gets selected and populate the input field
+
+			/*var myHiddenField = YAHOO.util.Dom.get("myHidden");*/
+			var myHandler = function(sType, aArgs)
+			{
+				var myAC = aArgs[0]; // reference back to the AC instance
+				var elLI = aArgs[1]; // reference to the selected LI element
+				var oData = aArgs[2]; // object literal of selected item's result data
+
+				// update hidden form field with the selected item's ID
+				/*myHiddenField.value = oData.n;*/
+
+				myAC.getInputEl().value = oData.n;
+			};
+			oAC.itemSelectEvent.subscribe(myHandler);
+
+			return {
+				oDS: oDS,
+				oAC: oAC
+			};
+		}
+	}
+}

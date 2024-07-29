@@ -1,0 +1,226 @@
+var nextZindex 	= 900;
+var nextIdDiv 	= 0;
+
+function createPopupDiv(config)
+{
+	if (config.scroll=='no')
+	{
+		var bodyTag = document.getElementById('body');
+		//bodyTag.style.overflow = 'hidden';
+		//document.body.scroll = 'no';
+	}
+	scroll(0,0); //document.documentElement.scrollTop = 0;
+	
+    var arrayPageScroll = getPageScroll();
+	var arrayPageSize = getPageSize();
+	
+	clienteWidth = arrayPageSize[0];
+	clienteHeight = arrayPageSize[1];
+		
+	configAlfa = {
+		width: clienteWidth,
+		height: clienteHeight,
+		top: 0,
+		left: 0,
+		alphaOpacity: config.alphaOpacity,
+		alphaColor: config.alphaColor
+	}
+	
+	config.left = (clienteWidth / 2) - (config.width / 2);
+	config.top = (arrayPageScroll[1] + (arrayPageSize[3] / 10)) + 25;
+	
+	if(config.wtype == 'rss') {config.top = 60;}
+	
+	//creo un div Alfa
+	if (config.alpha != 'no') createPopupDivAlfa(configAlfa);
+
+	divPopup = createPopDiv(config);
+	
+	//classname
+	divPopup.className = 'popup modal';
+	divPopup.setAttribute('id', 'popupdiv_' + nextIdDiv);
+	
+	divPopup.idDiv = nextIdDiv;
+	
+	nextIdDiv++;
+	
+	return divPopup;
+}
+
+function createPopupDivAlfa(config)
+{
+	config.isAlpha = true;
+
+	alfaDiv = createPopDiv(config);
+	
+	alfaDiv.setAttribute('id', 'alfa_' + nextIdDiv);	
+	alfaDiv.className = 'alfa';
+			
+	alfaDiv.style.background 	= config.alphaColor;
+	alfaDiv.style.filter 		= 'alpha(opacity=' + config.alphaOpacity + ')';
+	alfaDiv.style.opacity 		= config.alphaOpacity / 100;
+	
+	document.body.style.overflow	= 'hidden';
+}
+
+function createPopDiv(config)
+{
+	divPopup = document.createElement('div');
+	
+	divPopup.style.display	= 'block';
+	divPopup.style.position	= 'absolute';
+	//divPopup.style.position	= 'fixed';
+
+	if(config.wname=='confirm') { config.top = 300;	}
+	
+	divPopup.style.top 		= config.top + 'px';
+//	divPopup.style.left 	= config.left + 'px';
+//	divPopup.style.width 	= config.width + '%';
+	if(config.isAlpha)
+	{
+		divPopup.style.width			= '100%';
+		divPopup.style.height			= '100%';
+	}
+	
+    if(config.bgcolor) divPopup.style.backgroundColor = config.bgcolor;
+	
+	divPopup.style.zIndex 	= nextZindex++;
+	
+	document.body.appendChild(divPopup);
+
+	return divPopup;
+}
+
+function closePopUpDiv(queDiv, scroll)
+{
+	alfaDiv		= document.getElementById('alfa_' + queDiv.idDiv);
+	PopupDiv 	= queDiv;
+	
+	if(alfaDiv)
+	{
+		document.body.removeChild(alfaDiv);
+		document.body.style.overflow = 'auto';
+	}
+	document.body.removeChild(PopupDiv);
+	
+	if (typeof(scroll) != 'undefined')
+	{
+		document.body.style.overflow = 'auto';
+		document.body.scroll = 'yes';
+	}
+}
+
+function createConfirmPopupDiv(config)
+{ 
+	var confirmPopupDiv = createPopupDiv(config);
+	
+	var callback =
+	{
+		success: fillConfirmPopupDiv,
+		failure: null,
+		scope: this
+	}
+	
+	urlArchivo = '/administrar/darconfirmstructure/';
+	
+	postVar = 'width=' + config.width + '&height=' + config.height + '&idDiv=' + confirmPopupDiv.idDiv;
+	
+	YAHOO.util.Connect.asyncRequest('POST', urlArchivo, callback, postVar);
+	
+	function fillConfirmPopupDiv(obj)
+	{
+		confirmPopupDiv.innerHTML = obj.responseText;
+		confirmPopupDiv.classList.add("confirmPopUp");
+		
+		confirmTextTd = document.getElementById('popupConfirmText_' + confirmPopupDiv.idDiv);
+		
+		confirmTextTd.innerHTML = config.confirmText;
+		
+		confirmAceptar 	= document.getElementById('confirmAceptar_' + confirmPopupDiv.idDiv);
+		confirmAceptar.className = 'btn popupBotonRight';
+		
+		confirmCancelar = document.getElementById('confirmCancelar_' + confirmPopupDiv.idDiv);
+		confirmCancelar.className = 'btn';
+		
+		confirmCancelar.onclick = function()
+		{
+			config.funcionCancelar();
+			closePopUpDiv(confirmPopupDiv);
+		}
+		
+		confirmAceptar.onclick = function()
+		{
+			config.funcionAceptar();
+			closePopUpDiv(confirmPopupDiv);
+		}
+	}
+}
+
+function getPageSize(){
+	
+	var xScroll, yScroll;
+	
+	if (window.innerHeight && window.scrollMaxY) {	
+		xScroll = window.innerWidth + window.scrollMaxX;
+		yScroll = window.innerHeight + window.scrollMaxY;
+	} else if (document.body.scrollHeight > document.body.offsetHeight){ // all but Explorer Mac
+		xScroll = document.body.scrollWidth;
+		yScroll = document.body.scrollHeight;
+	} else { // Explorer Mac...would also work in Explorer 6 Strict, Mozilla and Safari
+		xScroll = document.body.offsetWidth;
+		yScroll = document.body.offsetHeight;
+	}
+	
+	var windowWidth, windowHeight;
+
+	if (self.innerHeight) {	// all except Explorer
+		if(document.documentElement.clientWidth){
+			windowWidth = document.documentElement.clientWidth; 
+		} else {
+			windowWidth = self.innerWidth;
+		}
+		windowHeight = self.innerHeight;
+	} else if (document.documentElement && document.documentElement.clientHeight) { // Explorer 6 Strict Mode
+		windowWidth = document.documentElement.clientWidth;
+		windowHeight = document.documentElement.clientHeight;
+	} else if (document.body) { // other Explorers
+		windowWidth = document.body.clientWidth;
+		windowHeight = document.body.clientHeight;
+	}	
+	
+	// for small pages with total height less then height of the viewport
+	if(yScroll < windowHeight){
+		pageHeight = windowHeight;
+	} else { 
+		pageHeight = yScroll;
+	}
+
+	// for small pages with total width less then width of the viewport
+	if(xScroll < windowWidth){	
+		pageWidth = xScroll;		
+	} else {
+		pageWidth = windowWidth;
+	}
+
+	arrayPageSize = new Array(pageWidth,pageHeight,windowWidth,windowHeight) 
+	return arrayPageSize;
+}
+
+function getPageScroll(){
+
+	var xScroll, yScroll;
+
+	if (self.pageYOffset) {
+		yScroll = self.pageYOffset;
+		xScroll = self.pageXOffset;
+	} else if (document.documentElement && document.documentElement.scrollTop){	 // Explorer 6 Strict
+		yScroll = document.documentElement.scrollTop;
+		xScroll = document.documentElement.scrollLeft;
+	} else if (document.body) {// all other Explorers
+		yScroll = document.body.scrollTop;
+		xScroll = document.body.scrollLeft;	
+	}
+
+	arrayPageScroll = new Array(xScroll,yScroll) 
+	return arrayPageScroll;
+}

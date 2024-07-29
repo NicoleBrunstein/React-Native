@@ -1,0 +1,1272 @@
+//==================================================================================================================
+//  Trim Whitespace
+//------------------------------------------------------------------------------------------------------------------
+String.prototype.trim=function(){
+	return this.replace(/^\s*|\s*$/g,'');
+}
+String.prototype.ltrim=function(){
+	return this.replace(/^\s*/g,'');
+}
+String.prototype.rtrim=function(){
+	return this.replace(/\s*$/g,'');
+}
+function DomGet(i) {
+	return document.getElementById(i);
+}
+//==================================================================================================================
+//  FIC_checkForm
+//  Form Input Checking by JC
+/*
+Apply these class names to form elements:
+
+* required (not blank)
+* validate-number (a valid number)
+* validate-digits (digits only, spaces allowed.)
+* validate-alpha (letters only)
+* validate-alphanum (only letters and numbers)
+* validate-date (a valid date value)
+* validate-email (a valid email address)
+* validate-url (a valid URL)
+* validate-date-au (a date formatted as; dd/mm/yyyy)
+* validate-currency-dollar (a valid dollar value)
+* validate-one-required (At least one checkbox/radio element must be selected in a group)
+* validate-not-first (Selects only, must choose an option other than the first)
+* validate-not-empty (Selects only, must choose an option with a value that is not empty)
+
+Also, you can specify this attribute for text, passwird and textarea elements:
+* minlength="x" (where x is the minimum number of characters)
+*/
+//------------------------------------------------------------------------------------------------------------------
+
+function FIC_checkForm(e)
+{
+	window.document.validateDate = null;
+	
+	clearErrors();
+
+	var sendFormType = false;
+
+	var errs = new Array();
+	//this function is called when a form is submitted.
+	if (typeof(e) == "string") {
+		//the id was supplied, get the object reference
+		e = xGetElementById(e);
+		if (!e) {
+			return true;
+		}
+	}
+
+	var elm=e;
+	if (!e.nodeName) {
+		//was fired by yahoo
+		elm = (e.srcElement) ? e.srcElement : e.target;
+	}
+	if (elm.nodeName.toLowerCase() != 'form') {
+		elm = searchUp(elm,'form');
+	}
+
+	var all_valid = true;
+
+	//access form elements
+	//inputs
+	var f_in = elm.getElementsByTagName('input');
+	//selects
+	var f_sl = elm.getElementsByTagName('select');
+	//textareas
+	var f_ta = elm.getElementsByTagName('textarea');
+
+	//check inputs
+	for (i=0;i<f_in.length;i++)
+	{
+		if (f_in[i].type.toLowerCase() != 'submit' && f_in[i].type.toLowerCase() != 'button')
+		{
+			if (f_in[i].id == 'sendFormType')
+			{
+				sendFormType = f_in[i];
+			}
+
+			if (isVisible(f_in[i]))
+			{
+				var cname = ' '+f_in[i].className.replace(/^\s*|\s*$/g,'') + ' ';
+				cname = cname.toLowerCase();
+				var inv = f_in[i].value.trim();
+				var t = f_in[i].type.toLowerCase();
+				var cext = '';
+				if (t == 'text' || t == 'password' || t == 'hidden') {
+					//text box
+					var valid = FIC_checkField(cname,f_in[i]);
+				} else if(t == 'radio' || t == 'checkbox'){
+					// radio or checkbox
+					var valid = FIC_checkRadCbx(cname,f_in[i],f_in);
+					cext = '-cr';
+				} else if (t == 'file') {
+					var tempHolder = f_in[i];
+					var valid = GMIC_checkFile(cname, tempHolder);
+					//f_in[i] = tempHolder;
+				} else {
+					var valid = true;
+				}
+
+
+				if (valid) {
+					//					removeClassName(f_in[i],'validation-failed'+cext);
+					//					addClassName(f_in[i],'validation-passed'+cext);
+				} else {
+					removeClassName(f_in[i],'validation-passed'+cext);
+					addClassName(f_in[i],'validation-failed'+cext);
+					//try to get title
+					if (f_in[i].getAttribute('title')){
+						errs[errs.length] = f_in[i].getAttribute('title');
+						// display error in span
+						displayError(f_in[i]);
+					}
+					all_valid = false;
+					//console.log('input: '+f_in[i].getAttribute('id'));
+				}
+			}
+		}
+	} //end for i
+
+	//check textareas
+	for (i=0;i<f_ta.length;i++) {
+		if (isVisible(f_ta[i])) {
+			var cname = ' '+f_ta[i].className.replace(/^\s*|\s*$/g,'') + ' ';
+			cname = cname.toLowerCase();
+			var valid = FIC_checkField(cname,f_ta[i]);
+
+			if (valid) {
+				removeClassName(f_ta[i],'validation-failed');
+				addClassName(f_ta[i],'validation-passed');
+			} else {
+				removeClassName(f_ta[i],'validation-passed');
+				addClassName(f_ta[i],'validation-failed');
+				//try to get title
+				if (f_ta[i].getAttribute('title')){
+					errs[errs.length] = f_ta[i].getAttribute('title');
+					// display error in span
+					displayError(f_ta[i]);
+				}
+				all_valid = false;
+				//console.log('textarea: '+f_ta[i].getAttribute('id'));
+			}
+		}
+	} //end for i
+
+	//check selects
+	for (i=0;i<f_sl.length;i++) {
+		if (isVisible(f_sl[i])) {
+			var cname = ' '+f_sl[i].className.replace(/^\s*|\s*$/g,'') + ' ';
+			cname = cname.toLowerCase();
+			
+			var valid = FIC_checkSel(cname,f_sl[i]);
+			if (valid) {
+				removeClassName(f_sl[i],'validation-failed-sel');
+				addClassName(f_sl[i],'validation-passed-sel');
+			} else {
+				//removeClassName(f_sl[i],'validation-passed-sel');
+				//addClassName(f_sl[i],'validation-failed-sel');
+				//try to get title
+				if (f_sl[i].getAttribute('title')){
+					errs[errs.length] = f_sl[i].getAttribute('title');
+					// display error in span
+					displayError(f_sl[i]);
+				}
+				all_valid = false;
+				//console.log('select: '+f_sl[i].getAttribute('id'));
+			}
+		}
+	} //end for i
+	if ( typeof captcha !== 'undefined' && !grecaptcha.getResponse(captcha))
+    {
+        all_valid = false;
+        $("#captcha").after( '<span class="msjErrFormReg" id="err_Captcha">Este campo es obligatorio</span>' );
+    }
+
+	if (!all_valid)
+	{
+		YAHOO.util.Event.stopEvent(e);
+		//window.location = '#';
+		abrirDialogo('Verifique los campos que tienen un mensaje en rojo para poder guardar.', 'error');
+	}
+	else
+	{
+		//if (elm.name == 'formvideoam')	launchLoading();
+        
+        iniciarCargando("Guardando...");
+        
+		if(sendFormType)
+		{
+			all_valid = false;
+			
+			YAHOO.util.Event.stopEvent(e);
+			
+			//window.location = '#';
+
+			switch(sendFormType.value)
+			{
+				case 'ServicioAlta':
+				ServicioAlta.enviar(false);
+				break;
+				default:
+				break;
+			}
+		}
+	}
+	
+	if(typeof(enviado) != 'undefined')
+	{
+		if(all_valid && !enviado)
+		{
+			enviado = true;
+		}
+		else
+		{
+			YAHOO.util.Event.stopEvent(e);
+		}
+	}
+
+	return all_valid;
+} // end FIC_checkForm
+
+//==================================================================================================================
+//  FIC_checkField
+//	c = className
+//	e = the element
+//------------------------------------------------------------------------------------------------------------------
+function FIC_checkField(c,e)
+{
+	var valid = true;
+	var t = e.value.trim();
+
+	//search for required
+	if (c.indexOf(' required ') != -1 && t.length == 0)
+	{
+		//required found, and not filled in
+		valid = false;
+	}
+    
+    if (c.indexOf(' obligatorio ') != -1 && t.length == 0)
+	{
+		valid = false;
+	}
+
+	c1 = document.getElementById('DOC_VISUALIZAR_CREAR');
+	c2 = document.getElementById('DOC_VISUALIZAR');
+	if (c1!=undefined) c1 = c1.checked; else c1 = false;
+	if (c2!=undefined) c2 = c2.checked; else c2 = false;
+	
+    //Comparar fechas de Formularios
+	if ( c.indexOf(' comparar-fecha ') != -1 )
+	{
+	   	var fchDsd = document.getElementsByName('dtpfechadesde_submit')[0].value;
+        var fchHst = document.getElementsByName('dtpfechahasta_submit')[0].value;  
+        var hrDsd = document.getElementsByName('dtphoradesde')[0].value;
+        var hrHst = document.getElementsByName('dtphorahasta')[0].value;
+        var FD = fchDsd + ' ' + hrDsd;
+        var FH = fchHst + ' ' + hrHst;
+        if(Date.parse(FH) <= Date.parse(FD)){
+            valid = false;
+        }
+ 
+	}
+    
+    //Comparar fechas de Repetición de EVENTOS
+	if ( c.indexOf(' comparar-fecha-repeticion ') != -1 )
+	{
+	   	var fchHst = document.getElementsByName('dtpfechahasta_submit')[0].value;
+        var fchFin = document.getElementsByName('dtpfechafinrepeticion_submit')[0].value;  
+        var hrHst = document.getElementsByName('dtphorahasta')[0].value;
+        var hrFin = '23:59';
+        var FH = fchHst + ' ' + hrHst;
+        var FR = fchFin + ' ' + hrFin;
+        if(Date.parse(FR) <= Date.parse(FH)){
+            valid = false;
+        }
+ 
+	}
+
+	//search for required
+	if ( c.indexOf(' curso-required ') != -1 && t.length == 0 && (c1 || c2) )
+	{
+		valid = false;
+	}
+
+	//check length
+	if (c.indexOf(' required ') != -1){
+		//check for minlength.
+		var m = e.getAttribute('minlength');
+		if (m && Math.abs(m) > 0){
+			if (e.value.length < Math.abs(m)){
+				valid = false;
+			}
+		}
+		
+		m = e.getAttribute('maxlength');
+		if (m && Math.abs(m) > 0){
+			if (e.value.length > Math.abs(m)){
+				valid = false;
+			}
+		}
+	}
+
+	// si llego al campo de Contraseña la guardo en una variable para luego
+	// compararla con el campo confirmacion de Contraseña
+	if((typeof(a) != 'undefined') && (typeof(b) != 'undefined'))
+	{
+		if(e.id == 'TxtPassword') a = t;
+		if(e.id == 'TxtPasswordConfirm') b = t;
+	}
+
+	//search for validate-
+	if (c.indexOf(' validate-number ') != -1 && isNaN(t) && t.match(/[^\d]/)) {
+		//number bad
+		valid = false;
+	} else if (c.indexOf(' validate-digits ') != -1 && t.replace(/ /,'').match(/[^\d]/)) {
+		//digit bad
+		valid = false;
+	} else if (c.indexOf(' validate-alpha ') != -1 && !t.match(/^[a-zA-Z]+$/)) {
+		//alpha bad
+		valid = false;
+	} else if (c.indexOf(' validate-alphanum ') != -1 && t.match(/\W/)) {
+		//alpha bad
+		valid = false;
+	} else if (c.indexOf(' validate-alphanum-space ') != -1 && t.match(/[^a-z0-9\s]/gi)) {
+		//alpha bad
+		valid = false;
+	} else if (c.indexOf(' validate-date ') != -1) {
+		var d = new date(t);
+		if (isNaN(d)) {
+			//date bad
+			valid = false;
+		}
+	} else if (c.indexOf(' validate-email ') != -1 && !t.match(/^[\w\.-]{1,}[@][\w\-]{1,}([.]([\w\-]{1,})){1,3}$/)) {
+		//email bad
+		valid = false;
+		if (c.indexOf(' required ') == -1 && t.length == 0) {
+			valid = true;
+		}
+	} else if (c.indexOf(' validate-url ') != -1 && !t.match(/^(http|https|ftp):\/\/(([A-Z0-9][A-Z0-9_-]*)(\.[A-Z0-9][A-Z0-9_-]*)+)(:(\d+))?\/?/i)) {
+		//url bad
+		valid = false;
+	} else if (c.indexOf(' validate-date-au ') != -1 && !t.match(/^(\d{2})\/(\d{2})\/(\d{4})$/)) {
+		valid = false;
+	} else if (c.indexOf(' validate-currency-dollar ') != -1 && !t.match(/^\$?\-?([1-9]{1}[0-9]{0,2}(\,[0-9]{3})*(\.[0-9]{0,2})?|[1-9]{1}\d*(\.[0-9]{0,2})?|0(\.[0-9]{0,2})?|(\.[0-9]{1,2})?)$/)) {
+		valid = false;
+	} else if (c.indexOf(' validate-2num ') != -1 && !t.match( '^(\\d|\\d\\d)$' )) {
+		valid = false;
+	} else if (c.indexOf(' validate-4num ') != -1 && !t.match( '^\\d\\d\\d\\d$' )) {
+		valid = false;
+	} else if (c.indexOf(' valid-date_d ') != -1 && !t.match( '^(\\d|\\d\\d)$' )) {
+		valid = false;
+	} else if (c.indexOf(' valid-date_m ') != -1 && !t.match( '^(\\d|\\d\\d)$' )) {
+		valid = false;
+	} else if (c.indexOf(' valid-date_y ') != -1 && !t.match( '^[1-2]\\d\\d\\d$' )) {
+		valid = false;
+	} else if (c.indexOf(' valid-date_h ') != -1 && !t.match( /^(0?\d|1\d|2[0-3])$/ )) {
+		valid = false;
+	} else if (c.indexOf(' valid-date_mi ') != -1 && !t.match( /^([0-5]?\d)$/ )) {
+		valid = false;
+	} else if (c.indexOf('compare-datetime') != -1 ) {
+
+		valid = false;
+		var fecDsdDay = document.getElementById(arr[2]+'_d').value;
+		var arr = c.split('_');
+
+		// Valores Fecha Desde
+		var fecDsdDay = document.getElementById(arr[2]+'_d').value;
+		var fecDsdMon = document.getElementById(arr[2]+'_m').value;
+		var fecDsdYea = document.getElementById(arr[2]+'_y').value;
+		var fecDsdHor = document.getElementById(arr[2]+'_h').value;
+		var fecDsdMin = document.getElementById(arr[2]+'_mi').value;
+		
+		// Valores Fecha Hasta
+		var fecHtaDay = document.getElementById(arr[1]+'_d').value;
+		var fecHtaMon = document.getElementById(arr[1]+'_m').value;
+		var fecHtaYea = document.getElementById(arr[1]+'_y').value;
+		var fecHtaHor = document.getElementById(arr[1]+'_h').value;
+		var fecHtaMin = document.getElementById(arr[1]+'_mi').value;
+		if (
+			validarFecha(fecDsdDay, fecDsdMon, fecDsdYea)
+			&& validarFecha(fecHtaDay, fecHtaMon, fecHtaYea)
+			&& validarHora(fecDsdHor, fecDsdMin)
+			&& validarHora(fecHtaHor, fecHtaMin)
+		)
+		{
+			var objFD = new Date(fecDsdYea,(fecDsdMon - 1),fecDsdDay, fecDsdHor, fecDsdMin);
+			var objFH = new Date(fecHtaYea,(fecHtaMon - 1),fecHtaDay, fecHtaHor, fecHtaMin);
+
+			if(objFD.getTime() < objFH.getTime())
+			{
+				valid = true;
+			}
+		}
+	} else if (c.indexOf('compare-date') != -1 ) {
+	
+		valid = false;
+		
+		var arr = c.split('_');
+
+		// Valores Fecha Desde
+		var fecDsdDay = document.getElementById(arr[2]+'_d').value;
+		var fecDsdMon = document.getElementById(arr[2]+'_m').value;
+		var fecDsdYea = document.getElementById(arr[2]+'_y').value;
+		
+		// Valores Fecha Hasta
+		var fecHtaDay = document.getElementById(arr[1]+'_d').value;
+		var fecHtaMon = document.getElementById(arr[1]+'_m').value;
+		var fecHtaYea = document.getElementById(arr[1]+'_y').value;
+		if (validarFecha(fecDsdDay, fecDsdMon, fecDsdYea) && validarFecha(fecHtaDay, fecHtaMon, fecHtaYea))
+		{
+			var objFD = new Date(fecDsdYea,(fecDsdMon - 1),fecDsdDay);
+			var objFH = new Date(fecHtaYea,(fecHtaMon - 1),fecHtaDay);
+
+			if(objFD.getTime() < objFH.getTime())
+			{
+				valid = true;
+			}
+		}
+	} else if (c.indexOf(' comp-contr-formreg ') != -1) {
+		// comparo los valores de los campos "contraseña" y "repetir contraseña"
+		// que estan almacenados en dos variables (a,b) javascript
+		if((typeof(a) != 'undefined') && (typeof(b) != 'undefined'))
+		{
+			if(a != b) valid = false;
+		}
+
+	}  else if (c.indexOf(' valid-fechas ') != -1) {
+		// hago las validacion sobre la fecha validez
+		if(fechaHasta['dia'] && fechaHasta['mes'] && fechaHasta['anio'])
+		{
+			var cFecHasta = 0;
+			if(fechaHasta['dia'] != '')
+			{
+				if(isNaN(fechaHasta['dia'])) cFecHasta++;
+			}
+			if(fechaHasta['mes'] != '')
+			{
+				if(isNaN(fechaHasta['mes'])) cFecHasta++;
+			}
+			if(fechaHasta['anio'] != '')
+			{
+				if(isNaN(fechaHasta['anio'])) cFecHasta++;
+			}
+
+			if(cFecHasta == 0)
+			{
+				if(!validarFecha(fechaHasta['dia'],fechaHasta['mes'],fechaHasta['anio']))
+				{
+					// muestro el mensaje de error de forma manual
+					displayError(objDestMsjEr[2][1]);
+					valid = false;
+				}
+			}
+			else
+			{
+				// muestro el mensaje de error de forma manual
+				displayError(objDestMsjEr[2][1]);
+				valid = false;
+			}
+		}
+	} else if (c.indexOf(' comp-fechas ') != -1) {
+
+		// hago las validacion sobre la fecha validez
+		var cFecValid = 0;
+		var cFecHasta = 0;
+
+		if(valFecValidez)
+		{
+			if(!validarFecha(fechaValidez['dia'],fechaValidez['mes'],fechaValidez['anio']))
+			{
+				// muestro el mensaje de error de forma manual
+				displayError(objDestMsjEr[1][1]);
+				cFecValid++;
+				valid = false;
+			}
+		}
+
+		// hago las validacion sobre la fecha hasta si el usuario completo dicho dato
+		if(valFecHasta)
+		{
+			if(fechaHasta['dia'] != '')
+			{
+				if(isNaN(fechaHasta['dia'])) cFecHasta++;
+			}
+			if(fechaHasta['mes'] != '')
+			{
+				if(isNaN(fechaHasta['mes'])) cFecHasta++;
+			}
+			if(fechaHasta['anio'] != '')
+			{
+				if(isNaN(fechaHasta['anio'])) cFecHasta++;
+			}
+			if(cFecHasta == 0)
+			{
+				if(!validarFecha(fechaHasta['dia'],fechaHasta['mes'],fechaHasta['anio']))
+				{
+					// muestro el mensaje de error de forma manual
+					displayErrorCustom(objDestMsjEr[1][2],'Fecha invalida');
+					cFecHasta++;
+					valid = false;
+				}
+			}
+			else
+			{
+				// muestro el mensaje de error de forma manual
+				displayErrorCustom(objDestMsjEr[1][2],'Fecha invalida');
+				cFecHasta++;
+				valid = false;
+			}
+
+		}
+
+		// si el usuario ingreso las dos fechas, despues de validarlas las comparo
+		if(comparar && cFecValid == 0 && (fechaValidez['dia'] != '' || fechaValidez['mes'] != '' || fechaValidez['anio'] != '' ))
+		{
+			if(ctrlFecHasta > ctrlFecValid)
+			{
+				displayError(objDestMsjEr[1][2]);
+				valid = false;
+				ctrlFecValid = null;
+				ctrlFecHasta = null;
+			}
+		}
+	} else if (c.indexOf(' formato-tag ') != -1 ) {
+		var cTag = 0;
+		var vTag = '';
+
+		if((t != ''))
+		{
+			// verifico que los tags esten formados por letrad del alfabeto y numeros.
+			// las expresiones que comienzan con "\u" seguidas de algo, sirven para aceptar tildes y "ñ" (eñes)
+			var fTag = /[a-zA-Z0-9\,\s\u00e1\u00e9\u00ed\u00f3\u00fa\u00c1\u00c9\u00cd\u00d3\u00da\u00f1\u00d1\#]+$/;
+			if(fTag.test(t))
+			{
+				var pTag = t.split(',');
+				for(var i = 0; i < pTag.length; i++)
+				{
+					vTag = pTag[i].trim();
+					if(vTag.length > 25)
+					{
+						cTag++;
+					}
+				}
+			}
+			else
+			{
+				cTag++;
+			}
+		}
+		
+		if (cTag > 0) valid = false;
+		
+	} 
+	else if (c.indexOf(' valid-img-up ') != -1 ) {
+		if(document.getElementById('FilBanner').value.length > 0)
+		{
+			if(document.getElementById('CblBanners').value == 0)
+			{
+				var extArch = GMIC_getExt(document.getElementById('FilBanner').value)
+				var validExts = new Array("jpg", "gif", "png","swf");
+				valid = false;
+				for(var i = 0 ;i < validExts.length; i++)
+				{
+					if(extArch == validExts[i])
+					{
+						valid = true;
+						break;
+					}
+				}
+				if(!valid)
+				{
+					displayErrorCustom(document.getElementById('evalFilImagen'),'Archivo de Imagen no v&aacute;lido');
+				}
+			}
+		}
+	} else if (c.indexOf(' srv-ban-img-up ') != -1 ) {
+		if(document.getElementById('FilBanner').value.length > 0)
+		{
+			if(document.getElementById('DdlBanner').value == 0)
+			{
+				var extArch = GMIC_getExt(document.getElementById('FilBanner').value);
+				var validExts = new Array("jpg", "gif", "png","swf");
+				valid = false;
+				for(var i = 0 ;i < validExts.length; i++)
+				{
+					if(extArch == validExts[i])
+					{
+						valid = true;
+						break;
+					}
+				}
+				if(!valid)
+				{
+					displayErrorCustom(document.getElementById('FilBanner'),'Archivo de Imagen no v&aacute;lido');
+				}
+			}
+		}
+	} else if (c.indexOf(' valid-imgnoticia-up ') != -1 ) {
+		if(document.getElementById('FilImagen').value.length > 0)
+		{
+			var extArch = GMIC_getExt(document.getElementById('FilImagen').value)
+			var validExts = new Array("jpg", "gif", "png","swf");
+			valid = false;
+			for(var i = 0 ;i < validExts.length; i++)
+			{
+				if(extArch == validExts[i])
+				{
+					valid = true;
+					break;
+				}
+			}
+		}
+		if(!valid)
+		{
+			displayErrorCustom(document.getElementById('evalFilImagen'),'Archivo de Imagen no v&aacute;lido 1');
+		}
+	} else if (c.indexOf(' comp-fecdesde-fechasta ') != -1 ) {
+		// hago una comparacion sobre la fechas de forma manual
+		var h = 0;
+		var i = 0;
+		var j = 0;
+		var k = false;
+		var l = false;
+		var m = true;
+		var n = true;
+
+		var fecDesde = false;
+		var fDDia = document.getElementById('DtpFechaDesde_d').value.trim();
+		var fDMes = document.getElementById('DtpFechaDesde_m').value.trim();
+		var fDAni = document.getElementById('DtpFechaDesde_y').value.trim();
+
+		var fecHasta = false;
+		var fHDia = document.getElementById('DtpFechaHasta_d').value.trim();
+		var fHMes = document.getElementById('DtpFechaHasta_m').value.trim();
+		var fHAni = document.getElementById('DtpFechaHasta_y').value.trim();
+
+		if(fDDia != '') i++;
+		if(fDMes != '') i++;
+		if(fDAni != '') i++;
+		if(i > 0) k = true;
+
+		if(fHDia != '') j++;
+		if(fHMes != '') j++;
+		if(fHAni != '') j++;
+		if(j > 0) l = true;
+
+		if(k)
+		{
+			if(!validarFecha(fDDia,fDMes,fDAni))
+			{
+				displayErrorCustom(document.getElementById('DtpFechaDesde_y'),'Fecha invalida');
+				h++;
+			}
+		}
+
+		if(l)
+		{
+			if(!validarFecha(fHDia,fHMes,fHAni))
+			{
+				displayErrorCustom(document.getElementById('DtpFechaHasta_y'),'Fecha invalida');
+				h++;
+			}
+		}
+
+		if((h == 0) && k && l)
+		{
+			var objFD = new Date(fDAni,fDMes,fDDia);
+			var objFH = new Date(fHAni,fHMes,fHDia);
+			if(objFD.getTime() > objFH.getTime())
+			{
+				displayErrorCustom(document.getElementById('DtpFechaHasta_y'),'La Fecha Hasta no debe ser menor a la Fecha Desde');
+				h++;
+			}
+		}
+		else
+		{
+			if(j < 3) displayErrorCustom(document.getElementById('DtpFechaHasta_y'),'Fecha invalida');
+			h++;
+		}
+		valid = ((h == 0) ? true : false);
+	} else if (c.indexOf(' required-urlrss ') != -1 ) {
+		if(t == '') valid = false;
+	} else if (c.indexOf(' required-denom-banner ') != -1 ) {
+
+		if((t == '') && (document.getElementById('FilBanner').value != ''))
+		{
+			valid = false;
+		}
+	} else if ( (t!='') && (c.indexOf(' val-ext-video ') != -1 )) {
+		if(!/\.(avi|flv|swf|mp4|mp3|mov|wmv|ogv|ogg|m4v|wav|mkv|mpg|3gp)$/i.test(t))
+		{
+			valid = false;
+		}
+	} else if ( (t!='') && (c.indexOf(' val-ext-videoflash ') != -1 )) {
+		if(!/\.(flv|mp4)$/i.test(t))
+		{
+			valid = false;
+		}
+	} else if (c.indexOf(' val-ext-videoimg ') != -1 ) {
+		if ((!/\.jpg$/i.test(t)) && (t.length > 0)  )
+		{
+			valid = false;
+		}
+	} else if (c.indexOf(' alumno-nombre ') != -1 ) {
+		var valDdl = DomGet('DdlSoyDeOrt').value;
+		if(t == '' || t.toLowerCase() == 'nombre' && valDdl > 7) valid = false;
+	} else if (c.indexOf(' alumno-apellido ') != -1 ) {
+		var valDdl = DomGet('DdlSoyDeOrt').value;
+		if(t == '' || t.toLowerCase() == 'apellido' && valDdl > 7) valid = false;
+	} else if (c.indexOf(' alumno-anio ') != -1 ) {
+		var valDdl = DomGet('DdlSoyDeOrt').value;
+		if(t == '' || t.toLowerCase() == 'año' && valDdl > 7) valid = false;
+	} else if (c.indexOf(' alumno-division ') != -1 ) {
+		var valDdl = DomGet('DdlSoyDeOrt').value;
+		if(t == '' || t.toLowerCase() == 'division' && valDdl > 7) valid = false;
+	} else if (c.indexOf(' valid-date-or-null_d ') != -1) {
+		var grlId = e.id.substring(0, e.id.lastIndexOf('_')),
+		inpDay = t,
+		inpMon = DomGet(grlId+'_m').value.trim(),
+		inpYea = DomGet(grlId+'_y').value.trim();
+		
+		valid = false;
+		
+		if (inpDay != '' && inpMon != '' && inpYea != '')
+		{
+			if (/^[\d]{1,2}-[\d]{1,2}-[\d]{4}$/.test(inpDay+'-'+inpMon+'-'+inpYea))
+            {
+	            valid = validarFecha(inpDay,inpMon,inpYea);
+            }
+		}
+		else if (inpDay == '' && inpMon == '' && inpYea == '')
+		{
+			valid = true;
+		}
+	} else if (c.indexOf(' valid-date-or-null_m ') != -1) {
+		var grlId = e.id.substring(0, e.id.lastIndexOf('_')),
+		inpDay = DomGet(grlId+'_d').value.trim(),
+		inpMon = t,
+		inpYea = DomGet(grlId+'_y').value.trim();
+		
+		valid = false;
+		
+		if (inpDay != '' && inpMon != '' && inpYea != '')
+		{
+			if (/^[\d]{1,2}-[\d]{1,2}-[\d]{4}$/.test(inpDay+'-'+inpMon+'-'+inpYea))
+            {
+	            valid = validarFecha(inpDay,inpMon,inpYea);
+            }
+		}
+		else if (inpDay == '' && inpMon == '' && inpYea == '')
+		{
+			valid = true;
+		}
+	} else if (c.indexOf(' valid-date-or-null_y ') != -1) {
+		var grlId = e.id.substring(0, e.id.lastIndexOf('_')),
+		inpDay = DomGet(grlId+'_d').value.trim(),
+		inpMon = DomGet(grlId+'_m').value.trim(),
+		inpYea = t;
+		
+		valid = false;
+		
+		if (inpDay != '' && inpMon != '' && inpYea != '')
+		{
+			if (/^[\d]{1,2}-[\d]{1,2}-[\d]{4}$/.test(inpDay+'-'+inpMon+'-'+inpYea))
+            {
+	            valid = validarFecha(inpDay,inpMon,inpYea);
+            }
+		}
+		else if (inpDay == '' && inpMon == '' && inpYea == '')
+		{
+			valid = true;
+		}
+	} else if (c.indexOf(' valid-jer ') != -1 && t > 99990 ) {
+		valid = false;
+	}
+	
+	// Nuevas funciones para validar fechas de formularios de alta
+	if (/validate\-complete_/.test(c))
+    {
+		if (!window.document.validateDate)
+        {
+			window.document.validateDate = {};
+        }
+
+		var a = c.match(/validate\-complete_[^_]+/);
+		
+		if (window.document.validateDate[a] === undefined)
+        {
+			var b = a[0].substring(a[0].indexOf('_') + 1).match(/[^\s]+/);
+			
+			window.document.validateDate[a] = { day: false, month: false, year: false, hour: false, minute: false, second: false };
+			
+			var d = null;
+			
+			d = DomGet(b+'_d');
+			
+			if (d !== null)
+			{
+				window.document.validateDate[a].day = d.value;
+			}
+			
+			d = null;
+			
+			d = DomGet(b+'_m');
+			
+			if (d !== null)
+			{
+				window.document.validateDate[a].month = d.value;
+			}
+
+			d = null;
+			
+			d = DomGet(b+'_y');
+			
+			if (d !== null)
+			{
+				window.document.validateDate[a].year = d.value;
+			}
+
+			d = null;
+			
+			d = DomGet(b+'_h');
+			
+			if (d !== null)
+			{
+				window.document.validateDate[a].hour = d.value;
+			}
+
+			d = null;
+			
+			d = DomGet(b+'_mi');
+			
+			if (d !== null)
+			{
+				window.document.validateDate[a].minute = d.value;
+			}
+
+			d = null;
+			
+			d = DomGet(b+'_s');
+			
+			if (d !== null)
+			{
+				window.document.validateDate[a].second = d.value;
+			}
+			
+			valid = validarFecha(window.document.validateDate[a].day, window.document.validateDate[a].month, window.document.validateDate[a].year);
+			
+			//displayErrorCustom(DomGet(b),'Fecha inválida 1');
+        }
+    }
+
+	return valid;
+}
+
+//==================================================================================================================
+//  FIC_checkRadCbx
+//	c = className
+//	e = this element, radio or checkbox
+//	f = input fields dom element
+//------------------------------------------------------------------------------------------------------------------
+function FIC_checkRadCbx(c,e,f){
+	var valid = true;
+
+	//search for required
+	if (c.indexOf(' validate-one-required ') != -1) {
+		//required found
+		//check if other checkboxes or radios have been selected.
+		valid = false;
+		for (var i=0;i<f.length;i++){
+			if(f[i].name.toLowerCase() == e.name.toLowerCase() && f[i].checked){
+				valid = true;
+				break;
+			}
+		}
+	}
+	else if (c.indexOf(' compmoderacion ') != -1) {
+		// Validacion para verificar que se seleccione un moderador si la opcion de moderacion de contenido esta activada
+		if(e.checked)
+		{
+			valid = false;
+			var oPermJer = document.getElementById('TblPermJer');
+			var oPerm = null;
+
+			for (var i = 0; i < oPermJer.childNodes.length; i++)
+			{
+				oPerm = oPermJer.childNodes[i];
+				if(oPerm.data.Perm == 'MODERARCONTENIDO')
+				{
+					valid = true;
+					break;
+				}
+			}
+
+			if(!valid)
+			{
+				var oPermUsu = document.getElementById('TblPermUsu');
+				for (var i = 0; i < oPermUsu.childNodes.length; i++)
+				{
+					oPerm = oPermUsu.childNodes[i];
+					if(oPerm.data.Perm == 'MODERARCONTENIDO')
+					{
+						valid = true;
+						break;
+					}
+				}
+			}
+		}
+		if(!valid)
+		{
+			document.getElementById('err_'+e.id).innerHTML = 'Debe seleccionar un moderador para esta opcion';
+		}
+	}
+	else if (c.indexOf(' validate-noticeservice ') != -1) {
+		valid = false;
+		
+		if (e.checked) 
+		{
+			var hidNotSrv = document.getElementById('HidMoverContenidoVencido');
+
+			if (hidNotSrv.value.length > 0) 
+			{
+				valid = true;
+			}
+			else
+			{
+				displayErrorCustom(e,'Debe seleccionar un Servicio');
+			}
+		}
+		else
+		{
+			valid = true;
+		}
+	}
+
+	return valid;
+}
+
+//==================================================================================================================
+//  FIC_checkSel
+//	c = className
+//	e = this select element
+//------------------------------------------------------------------------------------------------------------------
+function FIC_checkSel(c,e){
+	var valid = true;
+	
+	//search for validate-
+	if (c.indexOf(' validate-not-first ') != -1 && e.selectedIndex == 0) {
+		//bad
+		valid = false;
+	} else if (c.indexOf(' validate-not-empty ') != -1 && e.options[e.selectedIndex].value.length == 0) {
+		//bad
+		valid = false;
+	} else if (c.indexOf(' select-banner-am ') != -1 ) {
+		if((document.getElementById('CblBanners').value <= 0) && (document.getElementById('FilBanner').value.length == 0))
+		{
+			displayErrorCustom(document.getElementById('CblBanners'),'Debe seleccionar un banner');
+			valid = false;
+		}
+	} else if (c.indexOf(' sel-svr-banner-am ') != -1 ) {
+		if(document.getElementById('DdlBanner').value <= 0)
+		{
+			if(document.getElementById('FilBanner').value.length == 0)
+			{
+				displayErrorCustom(document.getElementById('DdlBanner'),'Debe seleccionar un banner');
+				valid = false;
+			}
+			
+			if(document.getElementById('TxtDenominacion').value.length == 0)
+			{
+				displayErrorCustom(document.getElementById('TxtDenominacion'),'Debe ingresar un nombre');
+				valid = false;
+			}
+		}
+	} else if (c.indexOf(' select-materia-servtp ') != -1 && e.selectedIndex < 0) {
+		var chkAllMat = document.getElementById('ChkListarMasMaterias');
+		
+		if (chkAllMat)
+        {
+			valid = (chkAllMat.checked ? true : false);
+        }
+		else
+		{
+			valid = false;
+		}
+	} else if (c.indexOf(' select-todamateria-servtp ') != -1 && e.selectedIndex < 0) {
+		var chkAllMat = document.getElementById('ChkListarMasMaterias');
+
+		if (chkAllMat)
+		{
+			valid = (chkAllMat.checked ? false : true);
+		}
+		else
+		{
+			valid = false;
+		}
+	}
+	
+	return valid;
+}
+//==================================================================================================================
+//  GMIC_checkFile
+//  c = className
+//  e = this select element
+//------------------------------------------------------------------------------------------------------------------
+
+function GMIC_checkFile(c,e){
+	var valid = true;
+	
+	//search for validate-
+	if (c.indexOf(' validate-ext ') != -1 && GMIC_checkExt(e)) {
+		//bad
+		valid = false;
+	}
+	else if (c.indexOf(' validate-present ') != -1 && e.value == '') {
+		//bad
+		valid = false;
+	}
+	return valid;
+}
+//==================================================================================================================
+//  GMIC_checkExt
+//  e = element
+//------------------------------------------------------------------------------------------------------------------
+
+function GMIC_checkExt(e){
+	var validExts = new Array("jpg", "gif", "png", "flv");
+	var filename = e.value;
+	var ext = GMIC_getExt(filename);
+	var invalid = true;
+
+	for(i=0; i < 10; i++) {
+		if(ext == validExts[i]) {
+			invalid = false;
+		}
+	}
+
+	return invalid;
+}
+//==================================================================================================================
+//  GMIC_getExt
+//  filename = filename
+//------------------------------------------------------------------------------------------------------------------
+function GMIC_getExt(filename){
+	var dot_pos = filename.lastIndexOf(".");
+	if(dot_pos == -1) {
+		return "";
+	}
+	return filename.substr(dot_pos+1).toLowerCase();
+}
+//==================================================================================================================
+//  addClassName
+//------------------------------------------------------------------------------------------------------------------
+function addClassName(e,t) {
+	if (typeof e == "string") {
+		e = xGetElementById(e);
+	}
+	//code to change and replace strings
+	var ec = ' ' + e.className.replace(/^\s*|\s*$/g,'') + ' ';
+	var nc = ec;
+	t = t.replace(/^\s*|\s*$/g,'');
+	//check if not already there
+	if (ec.indexOf(' '+t+' ') == -1) {
+		//not found, add it
+		nc = ec + t;
+	}
+	//return the changed text!
+	e.className = nc.replace(/^\s*|\s*$/g,''); //trimmed whitespace
+	return true;
+}
+
+//==================================================================================================================
+//  removeClassName
+//------------------------------------------------------------------------------------------------------------------
+function removeClassName(e,t) {
+	if (typeof e == "string") {
+		e = xGetElementById(e);
+	}
+	//code to change and replace strings
+	var ec = ' ' + e.className.replace(/^\s*|\s*$/g,'') + ' ';
+	var nc = ec;
+	t = t.replace(/^\s*|\s*$/g,'');
+	//check if not already there
+	if (ec.indexOf(' '+t+' ') != -1) {
+		//found, so lets remove it
+		nc = ec.replace(' ' + t.replace(/^\s*|\s*$/g,'') + ' ',' ');
+	}
+	//return the changed text!
+	e.className = nc.replace(/^\s*|\s*$/g,''); //trimmed whitespace
+	return true;
+}
+
+//==================================================================================================================
+//  attachToForms
+//------------------------------------------------------------------------------------------------------------------
+function attachToForms(e) {
+	//search dom for all forms
+	var frms = document.getElementsByTagName('form');
+
+	for(var i=0;i<frms.length;i++) {
+		YAHOO.util.Event.addListener(frms[i], "submit", FIC_checkForm);
+	}
+}
+
+//==================================================================================================================
+//  isVisible
+//------------------------------------------------------------------------------------------------------------------
+function isVisible(e) {
+	//returns true is should be visible to user.
+	if (typeof e == "string") {
+		e = xGetElementById(e);
+	}
+
+	if (e.type=="hidden")
+	{
+		return true;
+	}
+
+	while (e.nodeName.toLowerCase() != 'body' && e.style.display.toLowerCase() != 'none') {
+		e = e.parentNode;
+	}
+
+	if (e.nodeName.toLowerCase() == 'body') {
+		return true;
+	} else{
+		return false;
+	}
+}
+
+//==================================================================================================================
+//  displayError
+//------------------------------------------------------------------------------------------------------------------
+function displayError(field) {
+	spanErrorName = 'err_' + field.getAttribute('name');
+
+	arr = spanErrorName.split('_');
+	sufijo = arr[arr.length-1];
+
+	if 	((sufijo == 'y') || (sufijo == 'm') || (sufijo == 'd') ||
+	(sufijo == 'h') || (sufijo == 'mi') || (sufijo == 's'))
+	{
+		pos = spanErrorName.lastIndexOf(sufijo);
+		spanErrorName = spanErrorName.substr(0,pos-1);
+	}
+
+	errorDisplay = document.getElementById(spanErrorName);
+	if (errorDisplay!=undefined){
+		errorDisplay.innerHTML =  field.getAttribute('title');
+	}
+}
+
+function clearErrors()
+{
+	spans = document.getElementsByTagName('span');
+	c=0;
+	for(i=0;i<spans.length;i++)
+	{
+		name = spans[i].id;
+		if (name.substr(0,4)=='err_')
+		{
+			spans[i].innerHTML = '';
+		}
+	}
+
+}
+
+YAHOO.util.Event.addListener(window, "load", attachToForms);
+
+var _filvalid = false;
+
+function validateFileExtension(fld, fld_type) {
+
+	this._filvalid = true;
+
+	if(fld_type == 'img')
+	{
+		if(!/(\.bmp|\.gif|\.jpg|\.jpeg|\.png|.flv)$/i.test(fld.value)) {
+			alert("Invalido: tipo de achivo no permitido.");
+			fld.form.reset();
+			fld.focus();
+			this._filvalid=false;
+		}
+	}
+
+	if(fld_type == 'video')
+	{
+		if(!/(\.flv)$/i.test(fld.value)) {
+			alert("Invalido: tipo de achivo no permitido.");
+			fld.form.reset();
+			fld.focus();
+			this._filvalid=false;
+		}
+	}
+
+	return this._filvalid;
+}
+
+function validateFrm(obj)
+{
+	this._filvalid = false;
+	if(typeof(obj) == 'object')
+	{
+		if(typeof(obj.FilImagen) != 'undefined')
+		{
+			if(IsEmpty(obj.FilImagen)) this._filvalid=true;
+		}
+	}
+
+	return this._filvalid;
+}
+
+//==================================================================================================================
+//  displayErrorCustom
+//------------------------------------------------------------------------------------------------------------------
+function displayErrorCustom(field,msjErr) {
+	spanErrorName = 'err_' + field.getAttribute('name');
+	arr = spanErrorName.split('_');
+	sufijo = arr[arr.length-1];
+
+	if 	((sufijo == 'y') || (sufijo == 'm') || (sufijo == 'd') ||
+	(sufijo == 'h') || (sufijo == 'mi') || (sufijo == 's'))
+	{
+		pos = spanErrorName.lastIndexOf(sufijo);
+		spanErrorName = spanErrorName.substr(0,pos-1);
+	}
+
+	errorDisplay = document.getElementById(spanErrorName);
+	if (errorDisplay!=undefined){
+		errorDisplay.innerHTML =  msjErr;
+	}
+}
+
+
+function launchLoading()
+{
+	var arrayPageSize = getPageSize();
+
+	clienteWidth = arrayPageSize[0];
+	clienteHeight = arrayPageSize[1];
+
+	posLeft = (clienteWidth / 2) - 100;
+	posTop = (clienteHeight / 2) - 15;
+
+	divLoading = document.getElementById('loading');
+	divLoading.style.left = posLeft + 'px';
+	divLoading.style.top = posTop + 'px';
+	divLoading.style.display = 'block';
+}
+
+function AddToDate(nombre, interval)
+{
+	if ( !document.getElementById( nombre + '_' + interval ) ) return '';
+
+
+	if(document.getElementById( nombre + '_' + interval).value.length < 2)
+	{
+		return '0'+document.getElementById( nombre + '_' + interval ).value;
+	}
+	else
+	{
+		return document.getElementById( nombre + '_' + interval ).value;
+	}
+}

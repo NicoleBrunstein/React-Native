@@ -1,0 +1,220 @@
+/*************** Vista TP*********************/
+div.contFormVistTp
+{
+	clear:both;
+	margin:0;
+	padding:0 16px 0 16px;
+	background-color:#f2f2f2;
+    overflow: hidden;
+}
+div.sepCampVistTp
+{
+	clear:both;
+}
+div.titVistTp
+{
+	padding: 10px 0;
+    font-weight: bold;
+    color: #1976D2;
+}
+div.titVistTp a
+{
+	font-weight: bold;
+}
+div.contFormVistaTp
+{
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    padding-bottom: 30px;
+}
+.contFormVistaTp .error
+{
+	background: #FFF;
+	color: #F00;
+
+	text-align: center;
+	font-size: 12px;
+	font-weight: bold;
+	padding: 5px;
+	margin: 10px 0;
+}
+textarea.visTpTexto
+{
+	border:1px solid #858585;
+	width: 756px;
+	font-size:12px;
+	font-weight:normal;
+	color:#555555;
+	vertical-align:middle;
+	padding:5px 5px 5px 7px;
+	margin:0 0 15px 0;
+}
+.lnkDownVisTp
+{
+	color: #0064b2;
+	font-weight: bold;
+	padding-left: 5px;
+	height: 22px;
+	display: inline-block;
+	vertical-align: bottom;
+	width: auto !important;
+}
+
+.radioVista
+{
+	float: right;
+}
+
+/*************** Fin Vista TP*********************/
+/*************** Entregados TP*********************/
+tr.filListTps span.tag
+{
+	display: inline-block;
+	background: red;
+	color: white;
+	font-size: xx-small;
+	padding: 2px 4px;
+	border-radius: 5px;
+	margin: 5px;
+}
+tr.filListTps span.tag.green
+{
+	background: green;
+	color: white;
+}
+span.lnkLisTps
+{
+	cursor:pointer;
+}
+span.lnkLisTps:hover
+{
+	cursor:pointer;
+	text-decoration:underline;
+}
+
+#formTp
+{
+	margin: 15px 0;
+	border: 1px solid #CCC;
+	padding: 15px;
+	background: #E5E5E5;
+}
+/*************** FinEntregados TP*********************/
+
+/*************** Nuevos Colores *********************/
+
+.rojo{
+	background-color: #E47A8D!important;
+}
+.verde{
+    background-color: #A8D95F!important;
+}
+.gris{
+    background-color: #BABABA!important;
+}
+.amarillo{
+    background-color: #FFDC2E!important;
+}
+.celeste{
+    background-color: #94E1F2!important;
+}
+.naranja{
+	background-color: #FFC42E!important;
+}
+.naranja-text{
+	color: #FFC42E!important;
+}
+.widthbottombar{
+	width: 10rem;
+	height: fit-content!important;
+	text-align: center;
+	padding-right: 0px!important;
+	padding-left: 0px!important;
+}
+
+.last_child{
+	padding-top: 5px!important;
+}
+
+.last_child i{
+	font-size: 1.5em!important;
+}
+
+.widthbottombar p{
+	line-height: 1.3em;
+	margin-block-end: 0!important;
+	margin-block-start: 0!important;
+	font-size: 0.8em!important;
+	text-transform: lowercase!important;
+}
+.widthbottombar p::first-letter{
+	text-transform: capitalize!important;
+}
+#tablaEstadoSituacion .row{
+	margin-bottom: 5px!important;
+}
+#tablaEstadoSituacion .row:nth-of-type(5){
+	margin-top: 1em!important;
+}
+
+#tablaEstadoSituacion .row div:nth-child(2), #tablaEstadoSituacion .row div:nth-child(3), #tablaEstadoSituacion .row:first-child span:nth-child(2), #tablaEstadoSituacion .row:first-child span:nth-child(3){
+	width: 20%!important;
+	margin: 0 5px!important;
+}
+
+#tablaEstadoSituacion .row:first-child span:nth-child(2), #tablaEstadoSituacion .row:first-child span:nth-child(3){
+	padding-right: 0!important;
+	padding-left: 0!important;
+}
+
+#barra_destacados div:first-child,  #barra_exceptuados div:first-child{
+	padding: 2px 0!important;
+}
+@media(max-width: 747px){
+	#barra_destacados p ,  #barra_exceptuados p{
+		margin-block-start: 0.5em!important;
+		margin-block-end: 0.5em!important;
+	}
+}
+#drpJerarquias{
+	margin-bottom: 1em;
+}
+
+.itemTablaEstados{
+	padding: 0.3em 1em!important;
+}
+
+
+.textAlignRight{
+	text-align: right;
+}
+
+
+
+@media (max-width: 650px) {
+	.widthbottombar{
+		width: 8rem;
+	}
+	.last_child{
+		padding-top: 0px;
+		padding-bottom: 5px!important;
+	}
+}
+
+@media (max-width: 600px) {
+	.mobileboxresponsive{
+		text-align: center;
+	}
+}
+	@media (max-width: 580px){
+		.widthbottombar{
+			width: 4rem;
+		}
+
+	}
+@media (max-width: 526px) {
+	#topActions a{
+		margin-bottom: 10px;
+	}
+}

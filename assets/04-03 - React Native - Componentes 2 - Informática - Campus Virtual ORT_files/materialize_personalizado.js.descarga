@@ -1,0 +1,92 @@
+$( document ).ready(function(){
+		 $(".button-collapse").sideNav({
+	      //menuWidth: 260, // Default is 240
+	      edge: 'right', // Choose the horizontal origin
+	      closeOnClick: false // Closes side-nav on <a> clicks, useful for Angular/Meteor
+	    });
+		
+		$(".btnMenuUsuario").sideNav({
+	      menuWidth: 260, // Default is 240
+	      edge: 'right', // Choose the horizontal origin
+	      closeOnClick: true // Closes side-nav on <a> clicks, useful for Angular/Meteor
+	    });
+		$(".btnMenuUsuario").sideNav('hide');
+		 // Show sideNav
+		  //$('.menuUsuario').sideNav('show');
+		  // Hide sideNav
+		  //$('.menuUsuario').sideNav('hide');
+
+		 $('.collapsible').collapsible({
+		      accordion : true // A setting that changes the collapsible behavior to expandable instead of the default accordion style
+	    });
+	   $('.dropdown-button').dropdown({
+	      //inDuration: 300,
+	      //outDuration: 225,
+	      constrain_width: false, // Does not change width of dropdown to that of the activator
+	      hover: false, // Activate on hover
+	      gutter: 0, // Spacing from edge
+	      belowOrigin: true, // Displays dropdown below the button
+	      alignment: 'right' // Displays dropdown with edge aligned to the left of button
+    	
+        });
+    
+	   	$('.modal-trigger').leanModal();
+        
+        $('.btnLogin').on('click',function(){
+	      $('#subMenues').sideNav('hide');
+          $('#accesoRapido').slideUp(500, 'swing');
+          $('#TxtNombreUsuario').focus();
+	   	});
+        
+        $('#btnMenu').on('click',function(){
+          $('#accesoRapido').slideUp(500, 'swing');
+	   	});
+        
+        $('#BtnLogin').on('click',function(){
+	      $('#modalLogin').closeModal();
+	   	});
+       
+        //14.02.17 MK cierra el menu cuando se presiona "administrar"       
+        $('#btnAdministrarMenu').on('click',function(){
+	      $('#subMenues').sideNav('hide');
+	   	});
+        
+	    $('.btnAccesoRapido').on('click',function(){
+	      $('#accesoRapido').slideToggle(500, 'swing');
+          $('#subMenues').sideNav('hide');
+          $('#TxtMenu').focus();
+          
+	   	});
+	   	$('.closeAccesoRapido').on('click',function(){
+	      $('#accesoRapido').slideToggle(500, 'swing');
+	   	});
+        
+         $('.materialboxed').materialbox();
+
+	   	 $('.slider').slider({full_width: true});
+         
+         $('.tooltipped').tooltip({delay: 0});
+        
+         $('.datepicker').pickadate({
+            // Strings and translations
+            monthsFull: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+            monthsShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+            weekdaysShort: ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'],
+            weekdaysFull: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+            showMonthsFull: true,
+            showWeekdaysFull: true,
+            
+            // Buttons
+            today: 'Hoy',
+            clear: 'Borrar',
+            close: 'Cerrar',
+            
+            formatSubmit: 'yyyy/mm/dd',
+            
+            
+        });
+        
+        //Sacarle las clases a los tabs del menu de Materialize
+        //ui-tabs ui-corner-all ui-widget ui-widget-content (estas hay que sacar)
+        //$('#tabsMenu').removeClass('ui-tabs ui-corner-all ui-widget ui-widget-content');
+	});

@@ -1,0 +1,807 @@
+/******************************   INICIO HEADER    ************************************/
+div.headerSitio
+{
+	/*width: 870px;
+	height: 201px;
+	height:145px;
+	margin-left: auto;
+	margin-right: auto;*/
+}
+
+div.logoLink
+{
+	/*position: relative;
+	float:left;
+	background-color: #000000;
+	filter: alpha(opacity=0);
+	opacity: 0;*/
+	/*top: 65px;*/
+	/*top:10px;
+	width: 200px;
+	z-index: 1;
+	height: 80px;
+	cursor: pointer;*/
+}
+
+/* Inicio Fecha Y Texto de Ubicacion */
+div.contieneUbicacionYFecha
+{
+	height: 50px;
+}
+
+div.contieneFecha
+{
+	height: 20px;
+	padding-top: 4px;
+	text-align: right;
+	color: #00294c;
+}
+
+div.contieneUbicacion
+{
+	width:670px;
+	top:0;
+	padding-top:5px;
+	float: right;
+/*
+	width: 536px;
+	top:6px;
+*/
+	height: 26px;
+	position:relative;
+	background-repeat: repeat-y;
+}
+
+div.textoUbicacion
+{
+	width: auto;
+	/*height: 26px;*/
+	font-weight: bold;
+	text-align: right;
+	float:right;
+	height: 22px;
+}
+
+div.textoUbicacion h1
+{
+	font-size: 11px;
+	position:relative;
+	top: -20px;
+	_top: -14px;
+	*top: -14px;
+
+    line-height:40px;
+    text-align:center;
+}
+
+/* Fin Fecha Y Texto de Ubicacion */
+
+/* Inicio Cajas Con Buscador, logueo y usuario logueado*/
+
+div.contieneCajasHeader
+{
+	width: auto;
+}
+
+div.contieneCajas
+{
+	width: auto;
+	height: 71px;
+}
+
+div.cajas
+{
+	width: 454px;
+	height: 46px;
+	margin-top: 22px;
+	float: right;
+}
+
+div.cajaHeader
+{
+	min-height:44px;
+	height:auto !important;
+	height:44px;
+	float: left;
+	border: 1px solid #bbc8d5;
+	border-top: 1px solid #dbe1e8;
+	border-bottom: 1px solid #8baac6;
+	background: url(/static/images/azul/bg_caja_header.gif);
+	background-repeat: repeat-x;
+	background-color: #3b709e;
+	color:#fff;
+	padding-left:7px;
+	padding-top:3px;
+	font-family: verdana;
+	font-size:10px;
+}
+
+div.nombreUsuarioHead
+{
+	float: left;
+	width: auto;
+	margin-bottom: 3px;
+	padding-top:5px;
+	padding-right:10px;
+}
+
+div.nombreUsuarioHead a
+{
+	color: #6A6A6A;
+}
+
+div.nombreUsuarioHead span
+{
+	color: #6A6A6A;
+}
+
+div.accionesHeader {
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	height:23px;
+	background-color:#F2F2F2;
+	border-top: #727272 solid 1px;
+	z-index: 899;
+	/*height: 2.10em; */
+}
+
+div.accionesHeader img
+{
+	border: 0;
+	margin: 2px;
+}
+
+a.botonAccionesHeader
+{
+	cursor:pointer;
+}
+
+div.cajaLogin
+{
+	width: 244px;
+}
+
+span.cajaLoginNombre
+{
+	color:#00294c;
+	font-weight:bold;
+}
+
+.cajaLoginBienvenido
+{
+	float: left;
+	width:342px;
+	color:#6A6A6A;
+	margin:0 5px 0 35px;
+	margin-top:-2px;
+	_margin-top:0;
+	*margin-top:-1px;
+}
+#bodyPopUpDiv.bd {
+    height: auto !important;
+}
+div.cajaCampo
+{
+	float: left;
+}
+._frmLogin
+{
+	width:270px;
+	height:22px;
+	float:left;
+	padding-left:50px;
+}
+div.labelLogin
+{
+	color:#fff;
+	font-size:10px;
+	font-family:verdana;
+	/*position:relative;
+	float:left;*/
+	float:right;
+	width:230px;
+	left:425px;
+	/*top:-21px;*/
+}
+
+div.labelLogin span
+{
+	margin-left:54px;
+}
+
+input.cajasInput
+{
+	border: 1px solid #c6d1dd;
+}
+
+input.inputLogin
+{
+	width: 103px;
+	height:16px;
+	vertical-align:top;
+}
+
+input.buttonHeader
+{
+	position:relative;
+	width: 18px;
+	*width: 16px;
+	_width: 16px;
+	height:18px;
+	*height:17px;
+	_height:17px;
+	background : url(/static/images/azul/buttonLogin.gif);
+	border:0;
+	left:144px;
+	top:1px;
+	*top:0;
+	_top:0;
+	*margin-bottom:2px;
+	_margin-bottom:2px;
+	cursor: pointer;
+}
+
+input.buttonHeaderLogin
+{
+	position:relative;
+	width:17px;
+	height:19px;
+	background : url(/static/images/btn_registro.gif) center center;
+	border:0;
+	left:0;
+	top:0;
+	/**margin-bottom:2px;
+	_margin-bottom:2px;*/
+	cursor: pointer;
+	vertical-align: top;
+}
+
+.btnHeaders
+{
+	color: #6A6A6A;
+	background-color: #FEFEFE;
+	border: 1px solid #00689C;
+}
+
+input.inputSearch
+{
+	width: 130px;
+}
+
+div.cajaSearch
+{
+	position:relative;
+	width: 170px;
+	left: 8px;
+}
+
+div.cajaSearch span
+{
+	position: relative;
+	top:2px;
+}
+
+div.contieneTextoHeader
+{
+	margin-bottom: 15px;
+	width:454px;
+	/*width: auto;*/
+	height: 34px;
+	color:#fff;
+	font-size:11px;
+	font-family:verdana;
+}
+
+div.textoHeader
+{
+	/*width: 454px;*/
+	/*float: right;*/
+	/*text-align: left;*/
+	text-align: right;
+	margin-top:2px;
+	*margin-top:-16px;
+	position:relative;
+	float:left;
+	width:290px;
+	*width:295px;
+	_width:295px;
+	*top:2px;
+	_top:2px;
+	left:160px;
+	top:-14px;
+}
+
+#ortLoginPage
+{
+	/*line-height:16px;*/
+}
+#ortLoginPage div.recordarContrasena
+{
+	/*color:#FFF;
+	position:relative;
+	top:2px;
+	*top:4px;
+	_top:4px;
+	left:107px;*/
+}
+#ortLoginPage #ChkSaveLogin
+{
+	/*vertical-align: bottom;*/
+}
+#ortLoginPage #labelUserPass
+{
+	/*color: white;
+	display: inline-block;*/
+}
+#labelUserPass
+{
+	/*margin-top: 3px;*/
+}
+#labelUserPass label
+{
+	/*display: inline-block;
+	width: 103px;
+	padding: 0 2px;
+	margin-left: 1px;
+	font-weight: bold;*/
+}
+
+div.avisoErrorHeader
+{
+	width: 454px;
+	float: right;
+	color: #DED317;
+	text-align: left;
+	margin-top:2px;
+	position:relative;
+	top:-82px;
+}
+
+.contFormLogin
+{
+	float:left;
+	width:296px;
+	margin:0 0 0 85px;
+}
+.contSugMenu
+{
+	/*float:left;
+	margin:0 0 0 0;
+	width:130px;*/
+}
+.contSugMenu input
+{
+	/*width:130px;
+	height:16px;
+	border-top:1px solid #00689C;
+	border-right:1px solid #00689C;
+	border-bottom:1px solid #00689C;
+	border-left:1px solid #00689C;
+	background-color:#85b4d9;*/
+}
+.txtLabelSugCont
+{
+	/*font-family:verdana;
+	font-size:11px;
+	color:#08C1EF;
+	margin:3px 0 0 0;
+	*margin:5px 0 0 0;
+	_margin:5px 0 0 0;
+	text-align:right;*/
+}
+.contBusqContenido
+{
+	float:right;
+	width:141px;
+	height:18px;
+	margin:0 0 0 10px;
+	background-color:#ffffff;
+	border-top:1px solid #00689C;
+	border-right:1px solid #00689C;
+	border-bottom:1px solid #00689C;
+	border-left:1px solid #00689C;
+	z-index:1;
+}
+.inpTxtBusqCont
+{
+	width:118px;
+	*width:116px;
+	_width:116px;
+	height:15px;
+	color:#6A6A6A;
+	background-color:#FEFEFE;
+	border:0;
+}
+.botBusqContenido
+{
+	background:url(/static/images/azul/buttonLogin.gif) no-repeat scroll 0 -2px;
+	height:15px;
+	width:16px;
+	border:0;
+	cursor:pointer;
+	margin:0 0 0 0;
+	*margin:-18px 0 0 0;
+	z-index:0;
+}
+.contInpTxtSugCont
+{
+	/*height:22px;*/
+}
+.contInpTxtSugCont input
+{
+	/*font-family:verdana;
+	color:#6A6A6A;
+	font-size:11px;
+	padding:2px 0 0 0;*/
+}
+#TxtMenu{
+    width: 80%;
+    color: #FFFFFF;
+    position: static;
+}
+#contAutComMenu .yui-ac-content, #contAutComMenu .yui-ac-shadow{
+    margin-top:33px;
+}
+#contAutComMenu .yui-ac-content ul li{
+    width: 100%;
+    line-height: 30px;
+}
+.contOpcNoLog
+{
+	float:left;
+	width:585px;
+}
+.contLabBusqAvzda
+{
+	float:right;
+	padding:5px 0 0 0;
+}
+/* Fin Cajas Con Buscador, logueo y usuario logueado*/
+
+/* Inicio botonera */
+
+div.menuBotonera
+{
+	position: absolute;
+	display: none;
+	width: 200px;
+	z-index:299;
+	text-align: left;
+}
+
+div.menuBotonera ul
+{
+	padding: 0;
+	margin: 0;
+	position:relative;
+	top: 12px;
+	left: 1px;
+	*left: -58px;
+	_left: -58px;
+}
+
+
+div.subMenuBotonera
+{
+	width: 200px;
+	position:relative;
+	*position:relative;
+	_position:absolute;
+	display:none;
+	left: 199px;
+	*left: 258px;
+	_left: 258px;
+	top: -34px;
+	*top: -34px;
+	_top: -8px;
+	z-index:99;
+}
+
+div.subMenuBotonera ul
+{
+	padding: 0;
+	position:relative;
+}
+
+div.subMenuBotonera2
+{
+	width: 200px;
+	position:relative;
+	*position:relative;
+	_position:absolute;
+	display:none;
+	left:-2px;
+	top:-7px;
+	z-index:99;
+}
+
+div.subMenuBotonera2 ul
+{
+	padding: 0;
+	position:relative;
+}
+
+.menuLi
+{
+	list-style: none;
+	margin: 0;
+	height: 24px;
+	position: relative;
+	top: -4px;
+	font-weight: bold;
+	border-left: solid #fff 1px;
+	border-right: solid #fff 1px;
+	border-bottom: solid #fff 1px;
+}
+
+.menuLi2
+{
+	list-style: none;
+	margin: 0;
+	position: relative;
+	top: -4px;
+	font-weight: bold;
+	border-left: solid #fff 1px;
+	border-right: solid #fff 1px;
+	border-bottom: solid #fff 1px;
+}
+
+.menuLiActivo
+{
+	background: url(/static/images/azul/menuboton_activo.gif);
+	background-repeat: repeat-y;
+	color: #0064b2;
+}
+
+.menuLiInactivo
+{
+	background: url(/static/images/azul/menuboton_inactivo.gif);
+	background-repeat: repeat-y;
+	color: #ffffff;
+}
+
+.menuLiActivoWithBullet
+{
+	background: url(/static/images/azul/menuboton_activo_bullet.gif);
+	background-repeat: repeat-y;
+	color: #0064b2;
+}
+
+.menuLiInactivoWithBullet
+{
+	background: url(/static/images/azul/menuboton_inactivo_bullet.gif);
+	background-repeat: repeat-y;
+	color: #ffffff;
+}
+
+div.menuText
+{
+	position:relative;
+	top: 4px;
+	left: 8px;
+	width: 180px;
+}
+
+div.menuTextFavoritoColor
+{
+	color: #116F22;
+}
+
+div.MenuOrt
+{
+	width: 240px;
+	z-index: 999;
+	position:absolute;
+	max-height: 200px;
+	overflow: hidden;
+}
+
+div.MenuOrt div.menuButton,
+div.SubMenuOrt div.menuButton
+{
+	color: #fff;
+	width: 221px;
+	height: 24px;
+	line-height: 20px;
+	border: solid #fff 1px;
+	border-top: 0;
+	background-repeat: repeat-y;
+	font-weight: bold;
+}
+
+div.MenuOrt div.menuButton div.menuButtonText,
+div.SubMenuOrt div.menuButton div.menuButtonText
+{
+	float:left;
+	height: 24px;
+}
+
+div.MenuOrt div.menuButton div.menuButtonImg,
+div.SubMenuOrt div.menuButton div.menuButtonImg
+{
+	float:right;
+	margin-top: 9px;
+}
+
+
+div.MenuOrt div.menuButton
+{
+	background: url(/static/images/azul/menu_back.gif);
+}
+
+div.MenuOrt div.menuButton div.menuButtonText
+{
+	margin-left: 8px;
+}
+
+div.MenuOrt div.menuButton div.menuButtonImg
+{
+	margin-right: 3px;
+}
+
+div.SubMenuOrt
+{
+	width: 183px;
+	z-index: 999;
+	border-top: 0;
+}
+
+div.SubMenuOrt div.menuButton
+{
+	background: url(/static/images/azul/submenu_back.gif);
+}
+
+div.SubMenuOrt div.menuButton:hover
+{
+	background: url(/static/images/azul/submenu_back_over.gif);
+}
+
+div.SubMenuOrt div.menuButton div.menuButtonText
+{
+	margin-left: 12px;
+}
+
+div.SubMenuOrt div.menuButton:hover div.menuButtonText a
+{
+	color: #0064b2;
+}
+
+div.SubMenuOrt div.menuButton div.menuButtonImg
+{
+	margin-right: 3px;
+	height: 9px;
+	width: 5px;
+	background: url(/static/images/menu_right.gif);
+}
+
+div.SubMenuOrt div.menuButton:hover div.menuButtonImg
+{
+	background: url(/static/images/azul/menu_right_over.gif);
+}
+div.contieneBotoneraHeader
+{
+	width: 870px;
+	/*height: 46px;*/
+	margin-left: auto;
+	margin-right: auto;
+}
+
+div.contieneBotonesHeader
+{
+	width: 840px;
+	height: 46px;
+	margin-right: auto;
+	margin-left: auto;
+	background: url(/static/images/azul/bg_botonera.gif);
+	background-repeat: repeat-x;
+	float: left;
+}
+
+div.botonesHeader
+{
+	height: 27px;
+	width: 840px;
+	background: url(/static/images/azul/bg_botones.gif);
+	background-repeat: no-repeat;
+}
+
+div.botonHeader
+{
+	width: 120px;
+	float: left;
+	height: 27px;
+}
+
+div.botonHeaderActivo
+{
+	width: 120px;
+	height: 22px;
+	background: url(/static/images/azul/bg_boton_activo.gif);
+	padding-top: 5px;
+	font-size: 11px;
+	font-weight: bold;
+	color: #fff;
+	text-align: center;
+	cursor:pointer;
+}
+
+div.botonHeaderInactivo
+{
+	text-align: center;
+	width: 120px;
+	height: 24px;
+	padding-top: 5px;
+	font-size: 11px;
+	font-weight: normal;
+	color: #fff;
+	background-repeat: no-repeat;
+	background-position: right;
+	cursor:pointer;
+}
+
+div.botoneraCostado
+{
+	width: 15px;
+	height: 52px;
+	float: left;
+}
+
+div.botoneraIzq
+{
+	background: url(/static/images/azul/bg_botonera_izq.gif);
+	background-repeat: no-repeat;
+	background-position: bottom;
+	width: 15px;
+	height: 46px;
+	float: left;
+}
+
+div.botoneraIzqLogged
+{
+	background: url(/static/images/azul/bg_botonera_izq_logged.gif);
+	background-repeat: no-repeat;
+	background-position: bottom;
+	width: 15px;
+	height: 52px;
+	float: left;
+}
+
+div.botoneraDere
+{
+	background: url(/static/images/azul/bg_botonera_dere.gif);
+	background-repeat: no-repeat;
+	background-position: bottom;
+	width: 15px;
+	height: 46px;
+	float: left;
+}
+
+div.botoneraDereLogged
+{
+	background: url(/static/images/azul/bg_botonera_der_logged.gif);
+	background-repeat: no-repeat;
+	background-position: bottom;
+	width: 15px;
+	height: 52px;
+	float: left;
+}
+
+/* Fin botonera */
+/**** Autompletar Menu *****/
+.match
+{
+    font-weight:bold;
+}
+#sugMenu input
+{
+	width:142px;
+	position:relative;
+}
+#contAutComMenu div
+{
+	/*width:285px;*/
+}
+/**** Fin Autompletar Menu *****/
+/******************************   FIN HEADER    ************************************/

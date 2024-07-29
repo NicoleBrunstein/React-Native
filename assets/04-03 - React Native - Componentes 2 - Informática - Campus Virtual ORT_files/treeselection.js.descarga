@@ -1,0 +1,166 @@
+//aliases
+var Dom = YAHOO.util.Dom;
+var rootNode_Selec, lastNode_Selec = [];
+//namespace TreeVisualization
+var TreeSelection =
+{
+	init: function(treeDiv, jerarquias, type, params)
+	{
+		TreeSelection.treeDiv = treeDiv;
+
+		// Atributo de la clase que contendra la relacion IdJerarquia - IndiceTree de cada elemento del arbol
+		TreeSelection.oRelIndIdJer = new Object();
+		
+		// Prefijo del identificador del elemento Html que contiene el titulo de la Jerarquia
+		TreeSelection.sPrefElemTitJer = 'J_';
+
+		// Prefijo del Div que contiene el registro
+		TreeSelection.sPrefElemFilJer = 'ygtv';
+		
+		TreeSelection.params = params;
+		TreeSelection.type = type;
+		TreeSelection.draw(jerarquias);
+	},
+
+	draw: function(jerarquias)
+	{
+
+		TreeSelection.tree = new YAHOO.widget.TreeView(TreeSelection.treeDiv);
+		TreeSelection.tree.setDynamicLoad(TreeSelection.getJerarquiasHijas);
+
+		rootNode_Selec = TreeSelection.tree.getRoot();
+		var jerarquia, addTo, node;
+
+		TreeSelection.Jerarquias = [];
+
+		for (var i = 0; i < jerarquias.length; i++)
+		{
+			TreeSelection.addNode(TreeSelection, jerarquias[i]);
+		}
+
+		TreeSelection.tree.draw();
+	},
+	
+
+	addNode: function (tree, jerarquia, addTo)
+	{
+		addTo = addTo ? addTo : (jerarquia.Nivel == 0 ? rootNode_Selec : lastNode_Selec[jerarquia.Nivel - 1]);
+		var widthDiv = 710 - jerarquia.Nivel * 18;
+
+		textNode =  '<div class="treeAdm">';
+		textNode += '	<div class="treeAdmTitulo"><span id="'+TreeSelection.sPrefElemTitJer+jerarquia.IdJerarquia+'" onclick="TreeSelection.' + TreeSelection.type + '(' + jerarquia.IdJerarquia + ')">' + jerarquia.Nombre + '</span></div>';
+		//if(jerarquia.IdJerarquia != 99999) textNode += '	<div class="treeVisualizacionAcciones">' + eval('TreeSelection.GetText' + TreeSelection.type + '('+ jerarquia.IdJerarquia + ')') + '</div>';
+		textNode += '</div>';
+
+		node = lastNode_Selec[jerarquia.Nivel] = new YAHOO.widget.TextNode(textNode, addTo, jerarquia.Nivel == 0);
+		node.Jerarquia = jerarquia;
+		node.IdJerarquia = jerarquia.IdJerarquia;
+		node.isLeaf = jerarquia.isLeaf;
+		node.contentStyle = jerarquia.IsPrincipal ? 'principal' : 'noprincipal';
+
+		if(jerarquia.Nivel == 0)
+		{
+			node.dynamicLoadComplete = true;
+		}
+		
+		// Guardo la relacion IdJerarquia - IndiceTree
+		TreeSelection.oRelIndIdJer[jerarquia.IdJerarquia] = node.index;
+	},
+
+	GetTextVisualizacion: function(idJerarquia)
+	{
+		return '<img border="0" title="Ver Servicios" alt="Ver Servicios" src="' + Estaticos + '/static/images/vercontenidos.gif" onclick="TreeSelection.Visualizacion('+idJerarquia+')"/>';
+	},
+
+	Visualizacion: function(idJerarquia)
+	{
+		hiddenServicio = document.getElementById('infoServicio');
+		openVisualizationPopup('/visualizacion/' + idJerarquia + hiddenServicio.value);
+	},
+
+	VisualizacionChangeJer: function(check,idJerarquiaRaiz, idJerarquiaActual)
+	{
+		startWith = (check.checked) ? idJerarquiaActual : idJerarquiaRaiz;
+
+		function ok(obj)
+		{
+			jerarquias = eval( obj.responseText );
+			TreeSelection.draw(jerarquias);
+		}
+
+
+		YAHOO.util.Connect.asyncRequest('POST',
+										'/ajaxactions/ListConnectedByPrior',
+										{ success: ok, failure: null },
+										'startWith=' + startWith
+									);
+	},
+
+	GetTextCopiarMoverContenido: function(idJerarquia)
+	{
+		return '<img border="0" title="Ver Servicios" alt="Ver Servicios" src="' + Estaticos + '/static/images/vercontenidos.gif" onclick="TreeSelection.CopiarMoverContenido('+idJerarquia+')"/>';
+	},
+
+	CopiarMoverContenido: function(idJerarquia)
+	{
+		var hidActClk = document.getElementById('accionClickeada'),
+                act = '';
+
+                switch (hidActClk.value)
+                {
+                    case 'move':
+                        act = 'mover';
+                        break;
+                    case 'moveto':
+                        act = 'moverhacia';
+                        break;
+                    default:
+                        act = 'copiar';
+                        break;
+                }
+                
+		openVisualizationPopup('/visualizacion/' + idJerarquia + '/'+act+'contenido/'+TreeSelection.params.copiarCont+'/'+TreeSelection.params.idContCopia+'/1/FECHAMODIFICACION_DESC/');
+	},
+
+	GetTextCopiaServicio: function(idJerarquia)
+	{
+		return '<img class="hand" border="0" title="Ver Servicios" alt="Ver Servicios" src="' + Estaticos + '/static/images/vercontenidos.gif" onclick="TreeSelection.CopiaServicio(' + idJerarquia + ')"/>';
+	},
+
+	CopiaServicio: function(idJerarquia)
+	{
+		iniciarCargando();
+		window.setTimeout(function() {
+			window.location.href = 'http://' + TreeSelection.params.urlJerarquia + '/servicio/new/' + idJerarquia + '/' + TreeSelection.params.idContenidoSevicio;
+			}, 500);
+	},
+
+	VisualizacionUltimosCont: function(elHtml, idJerarquia)
+	{
+		hiddenServicio = document.getElementById('infoServicio');
+		openVisualizationPopup('/visualizacion/' + idJerarquia + hiddenServicio.value + '1');
+	},
+	
+	getJerarquiasHijas: function(node, fnLoadComplete)
+    {
+        var callback = { success: succes, scope: this };
+        var prm = 'i=' + node.Jerarquia.IdJerarquia + '&n=' + node.Jerarquia.Nivel;
+
+        YAHOO.util.Connect.asyncRequest('POST', '/ajaxactions/getJerarquiasHijasParaTree', callback, prm);
+
+        function succes(o)
+        {
+			var oResults = eval("(" + o.responseText + ")");
+			if(oResults.ResultSet.Result.length) {
+				for (var i=0; i<oResults.ResultSet.Result.length; i++) {
+					var jerarquia = oResults.ResultSet.Result[i];
+					//if(node.tree.getNodeByProperty('IdJerarquia',jerarquia.IdJerarquia) == null)
+					{
+						TreeSelection.addNode(TreeSelection, jerarquia, node);
+					}
+				}
+			}
+        	fnLoadComplete();
+        }
+    }
+}

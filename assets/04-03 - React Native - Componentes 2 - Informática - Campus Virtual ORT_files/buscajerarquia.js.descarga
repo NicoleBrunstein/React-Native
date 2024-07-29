@@ -1,0 +1,371 @@
+//String.prototype.trim = function(){return this.replace(/^\s*|\s*$/g,"");};
+if(!String.prototype.trim){  
+  String.prototype.trim = function(){  
+    return this.replace(/^\s*|\s*$/g,'');  
+  };  
+}
+
+var DomGet = YAHOO.util.Dom.get;
+
+var BuscJer =
+{
+	iniciar: function(aJer, treePrefix)
+	{
+		if(typeof(treePrefix) == 'undefined')
+			treePrefix = '';
+		
+		// Valores por default de la clase
+		BuscJer.bCtrol = false;
+		BuscJer.oTree = new Object();
+		BuscJer.sIdTxtBoxBusc = treePrefix+'txtBusc';
+		BuscJer.sIdTxtBotBusc = treePrefix+'botBusc';
+		BuscJer.sIdCompCont = treePrefix+'compCont';
+		BuscJer.sIdTxtBotPri = treePrefix+'botPri';
+		BuscJer.sIdTxtBotAnt = treePrefix+'botAnt';
+		BuscJer.sIdTxtBotSig = treePrefix+'botSig';
+		BuscJer.sIdTxtBotUlt = treePrefix+'botUlt';
+		BuscJer.sIdTxtBoxVal = null;
+		BuscJer.aJer = aJer;
+		BuscJer.aCoinc = false;
+		BuscJer.iResAct = false;
+		BuscJer.iResAnt = false;
+		BuscJer.sClassResaltRes = 'bgSugAutComp';
+		BuscJer.sClassSobreRes = 'bgSobSugAutComp';
+		BuscJer.aNomJer = false;
+		BuscJer.sIdContTree = treePrefix+'contGlobTree';
+		BuscJer.oContTree = false;
+		BuscJer.loadingJers = false;
+
+		BuscJer.oTxtBoxBusc = DomGet(BuscJer.sIdTxtBoxBusc);
+
+		// Verifico si el elemento input existe
+		try{BuscJer.bCtrl = typeof(BuscJer.oTxtBoxBusc.tagName) == 'string';}
+		catch(e){BuscJer.bCtrl = false;}
+
+		if(BuscJer.bCtrl)
+		{
+			BuscJer.oContTree = DomGet(BuscJer.sIdContTree);
+
+			YAHOO.util.Event.addListener(BuscJer.sIdTxtBotBusc, "click", function (){BuscJer.buscar();});
+			/*YAHOO.util.Event.addListener(BuscJer.sIdTxtBotPri, "click", function (){BuscJer.irPriRes();});
+			YAHOO.util.Event.addListener(BuscJer.sIdTxtBotAnt, "click", function (){BuscJer.irAntRes();});
+			YAHOO.util.Event.addListener(BuscJer.sIdTxtBotSig, "click", function (){BuscJer.irSigRes();});
+			YAHOO.util.Event.addListener(BuscJer.sIdTxtBotUlt, "click", function (){BuscJer.irUltRes();});*/
+			YAHOO.util.Event.addListener(BuscJer.sIdTxtBoxBusc, "focus", function (){BuscJer.Autocompletar();});
+		}
+
+		BuscJer.deshabBots();
+	},
+
+	buscar: function()
+	{
+		var i;
+		var j = 0;
+
+		BuscJer.estResAnt();
+
+		BuscJer.desmarcRes();
+
+		BuscJer.iResAnt = false;
+
+		BuscJer.iResAct = false;
+
+		BuscJer.aCoinc = false;
+
+		if(BuscJer.oTxtBoxBusc.value.trim().length > 0)
+		{
+			BuscJer.aCoinc = new Array();
+
+			for(i = 0; i < BuscJer.aJer.length; i++)
+			{
+				if(BuscJer.aJer[i].Nombre.toLowerCase().indexOf(BuscJer.oTxtBoxBusc.value.toLowerCase()) != -1)
+				{
+					BuscJer.aCoinc[j] = BuscJer.aJer[i].IdJerarquia;
+
+					if(j == 0)
+					{
+						var iIndTree = BuscJer.oTree.oRelIndIdJer[BuscJer.aJer[i].IdJerarquia];
+						
+						if(iIndTree == null)
+						{
+							var done = BuscJer.expandTrace(
+								BuscJer.aJer[i].IdJerarquia,
+								BuscJer.oTree.treeDiv_TreeJerarquias ?
+									BuscJer.oTree.treeDiv_TreeJerarquias.tree.getNodeByIndex(3).Jerarquia.IdJerarquia
+									: BuscJer.oTree.tree.getNodeByIndex(7).Jerarquia.IdJerarquia
+							);
+							if(!done)
+								return;
+						}
+
+						BuscJer.expandPadre(iIndTree, false);
+
+						/*BuscJer.oTree.treeDiv_TreeJerarquias.tree.getNodeByIndex(iIndTree).loadComplete()
+						{*/
+							BuscJer.redireccResAct(BuscJer.aJer[i].IdJerarquia);
+							BuscJer.iResAct = j;
+							BuscJer.estResAnt();
+							BuscJer.resaltRes();
+						//}
+					}
+
+					j++;
+				}
+			}
+		}
+
+		if(j > 0)
+		BuscJer.habBots();
+		else
+		BuscJer.deshabBots();
+	},
+	
+	expandTrace: function(idJerarquiaFinal, idJerarquiaStarter)
+	{
+		$('#txtBusc').addClass('loading-input');
+		var callback = {success: succes, scope: this};
+        var prm = 'i=' + idJerarquiaFinal + '&s=' + idJerarquiaStarter;
+
+        YAHOO.util.Connect.asyncRequest('POST', '/ajaxactions/getJerarquiaTrace', callback, prm);
+
+        function succes(o)
+        {
+        	var oResults = eval("(" + o.responseText + ")");
+        	for(var i = 0; i < oResults.length; i++)
+        	{
+        		var expanded = BuscJer.expandByJer(oResults[i]);
+        		if(!expanded)
+        		{
+        			setTimeout('BuscJer.buscar();', 10);
+        			return false;
+        		}
+        	}
+        	BuscJer.buscar();
+        	$('#txtBusc').removeClass('loading-input');
+        	return true;
+        }
+	},
+	
+	expandByJer: function(idJer)
+	{
+		var iIndTree = BuscJer.oTree.oRelIndIdJer[idJer];
+		var node = BuscJer.oTree.treeDiv_TreeJerarquias ? BuscJer.oTree.treeDiv_TreeJerarquias.tree.getNodeByIndex(iIndTree) : BuscJer.oTree.tree.getNodeByIndex(iIndTree);
+		node.expand();
+		return node.expanded;
+	},
+
+	estTree: function(oTree)
+	{
+		BuscJer.oTree = oTree;
+	},
+
+	expandPadre: function(iIndTree, bPrim)
+	{
+		var oNodAct = BuscJer.oTree.treeDiv_TreeJerarquias ? BuscJer.oTree.treeDiv_TreeJerarquias.tree.getNodeByIndex(iIndTree) : BuscJer.oTree.tree.getNodeByIndex(iIndTree);
+		
+		if(oNodAct)
+		{
+			if(bPrim) oNodAct.expand();
+
+			if(oNodAct.parent.index)
+			{
+				BuscJer.expandPadre(oNodAct.parent.index, true);
+			}
+		}
+	},
+
+	expandNodo: function()
+	{
+		var iIndTree = BuscJer.oTree.oRelIndIdJer[BuscJer.aCoinc[BuscJer.iResAct]];
+
+		BuscJer.expandPadre(iIndTree, true);
+
+		BuscJer.desmarcRes();
+
+		/*BuscJer.oTree.treeDiv_TreeJerarquias.tree.getNodeByIndex(iIndTree).loadComplete()
+		{*/
+			BuscJer.redireccResAct(BuscJer.aCoinc[BuscJer.iResAct]);
+			BuscJer.resaltRes();
+		//}
+	},
+
+	irPriRes: function()
+	{
+
+		BuscJer.estResAnt();
+
+		BuscJer.iResAct = 0;
+
+		BuscJer.expandNodo();
+	},
+
+	irAntRes: function()
+	{
+		BuscJer.estResAnt();
+
+		if(BuscJer.iResAct < 1)
+		BuscJer.iResAct = 0;
+		else
+		BuscJer.iResAct -= 1;
+
+		BuscJer.expandNodo();
+	},
+
+	irSigRes: function()
+	{
+		BuscJer.estResAnt();
+
+		if(BuscJer.iResAct >=  (BuscJer.aCoinc.length - 1))
+		BuscJer.iResAct = (BuscJer.aCoinc.length - 1);
+		else
+		BuscJer.iResAct += 1;
+
+		BuscJer.expandNodo();
+	},
+
+	irUltRes: function()
+	{
+		BuscJer.estResAnt();
+
+		BuscJer.iResAct = (BuscJer.aCoinc.length - 1);
+
+		BuscJer.expandNodo();
+	},
+
+	estResAnt: function()
+	{
+		if((BuscJer.iResAct >= 0) && BuscJer.aCoinc)
+		{
+			if(BuscJer.iResAct >= 0 && BuscJer.iResAct < BuscJer.aCoinc.length)
+			BuscJer.iResAnt = BuscJer.iResAct;
+		}
+		else
+		{
+			BuscJer.iResAnt =  false;
+		}
+	},
+
+	desmarcRes: function()
+	{
+		if(BuscJer.iResAnt !== false)
+		{
+			var iIndTree = BuscJer.oTree.oRelIndIdJer[BuscJer.aCoinc[BuscJer.iResAnt]];
+
+			DomGet(BuscJer.oTree.sPrefElemFilJer+iIndTree).firstChild.setAttribute('class', '');
+			DomGet(BuscJer.oTree.sPrefElemFilJer+iIndTree).firstChild.className = '';
+			DomGet(BuscJer.oTree.sPrefElemFilJer+iIndTree).firstChild.style.backgroundColor = '';
+		}
+	},
+
+	deshabBots: function()
+	{
+		/*DomGet(BuscJer.sIdTxtBotPri).disabled = true;
+		DomGet(BuscJer.sIdTxtBotAnt).disabled = true;
+		DomGet(BuscJer.sIdTxtBotSig).disabled = true;
+		DomGet(BuscJer.sIdTxtBotUlt).disabled = true;*/
+	},
+
+	habBots: function()
+	{
+		/*DomGet(BuscJer.sIdTxtBotPri).disabled = false;
+		DomGet(BuscJer.sIdTxtBotAnt).disabled = false;
+		DomGet(BuscJer.sIdTxtBotSig).disabled = false;
+		DomGet(BuscJer.sIdTxtBotUlt).disabled = false;*/
+	},
+
+	resaltRes: function()
+	{
+		if(BuscJer.aCoinc)
+		{
+			var iIndTree = BuscJer.oTree.oRelIndIdJer[BuscJer.aCoinc[BuscJer.iResAct]];
+
+			DomGet(BuscJer.oTree.sPrefElemFilJer+iIndTree).firstChild.setAttribute('class', BuscJer.sClassResaltRes);
+			//DomGet(BuscJer.oTree.sPrefElemFilJer+iIndTree).firstChild.className = BuscJer.sClassResaltRes;
+		}
+	},
+
+	redireccResAct: function(iIdJer)
+	{
+		BuscJer.posicEnScroll( DomGet(BuscJer.oTree.sPrefElemTitJer+iIdJer).parentNode.offsetTop );
+	},
+
+
+	posicEnScroll: function(iCant)
+	{
+		{DomGet(BuscJer.sIdContTree).scrollTop = (iCant - 5);}
+	},
+
+	Autocompletar: function()
+	{
+		if(BuscJer.loadingJers)
+			return;
+		
+		if(!BuscJer.aJer)
+		{
+			BuscJer.loadingJers = true;
+			
+			var handleSuccess = function(o)
+			{
+				if(o.responseText !== undefined)
+				{
+					BuscJer.aJer = YAHOO.lang.JSON.parse(o.responseText);
+
+					function SortByName(a, b) {
+						var aName = a.Nombre.toLowerCase();
+						var bName = b.Nombre.toLowerCase();
+						return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
+					}
+					BuscJer.aJer.sort(SortByName);
+
+					BuscJer.loadingJers = false;
+					BuscJer.Autocompletar();
+				}
+			};
+
+			YAHOO.util.Connect.asyncRequest('POST', '/ajaxactions/GetJerarquiasForAutocomplete', {success:handleSuccess});
+			return;
+		}
+		
+		if(!BuscJer.aNomJer && BuscJer.aJer)
+		{
+			BuscJer.aNomJer = [];
+
+			var i;
+
+			for(i = 0; i < BuscJer.aJer.length; i++)
+			{
+				BuscJer.aNomJer[i] = BuscJer.aJer[i].Nombre;
+			}
+		}
+
+		if(BuscJer.aNomJer)
+		{
+			YAHOO.example.Data =
+			{
+				jerarquias: BuscJer.aNomJer
+			};
+
+			YAHOO.example.BasicLocal = function() {
+				// Use a LocalDataSource
+				var oDS = new YAHOO.util.LocalDataSource(YAHOO.example.Data.jerarquias);
+				// Optional to define fields for single-dimensional array
+				oDS.responseSchema = {fields : ["jerarquia"]};
+
+				// Instantiate the AutoComplete
+				var oAC = new YAHOO.widget.AutoComplete(BuscJer.sIdTxtBoxBusc, BuscJer.sIdCompCont, oDS);
+				oAC.highlightClassName = BuscJer.sClassResaltRes;
+				oAC.prehighlightClassName = BuscJer.sClassSobreRes;
+				oAC.useShadow = false;
+				oAC.queryDelay = 0;
+				oAC.autoHighlight = true;
+				oAC.minQueryLength = 1;
+				oAC.queryMatchContains = true;
+
+				return {
+					oDS: oDS,
+					oAC: oAC
+				};
+			}();
+		}
+	}
+}

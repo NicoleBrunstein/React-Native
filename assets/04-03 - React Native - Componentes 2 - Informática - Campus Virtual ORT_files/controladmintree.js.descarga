@@ -1,0 +1,236 @@
+//aliases 
+var Dom = YAHOO.util.Dom;
+var DomGet = Dom.get;
+var rootNode, lastNode = [];
+var jerarquiaActual, raizUrlAcceso, anId, esAlumno, jerarquiaRaiz;
+//namespace TreeAdminCtrl
+var TreeAdminCtrl =
+{
+	init: function(treeDiv, jerarquias, selected, hiddenName, _jerarquiaActual, _jerarquiaRaiz, jerarquiaAnonimo, _raizUrlAcceso, _esAlumno)
+	{
+		TreeAdminCtrl[treeDiv] = {};
+		TreeAdminCtrl[treeDiv].tree = new YAHOO.widget.TreeView(treeDiv);
+		TreeAdminCtrl[treeDiv].tree.setDynamicLoad(TreeAdminCtrl.getJerarquiasHijas);
+		TreeAdminCtrl[treeDiv].tree.root.multiExpand = true;
+
+		// Atributo de la clase que contendra la relacion IdJerarquia - IndiceTree de cada elemento del arbol
+		TreeAdminCtrl.oRelIndIdJer = new Object();
+
+		// Prefijo del identificador del elemento Html que contiene el titulo de la Jerarquia
+		TreeAdminCtrl.sPrefElemTitJer = 'J_';
+
+		// Prefijo del Div que contiene el registro
+		TreeAdminCtrl.sPrefElemFilJer = 'ygtv';
+
+		rootNode = TreeAdminCtrl[treeDiv].tree.getRoot();
+		//var jerarquia, addTo, node, lastNode = [];
+		
+		anId = jerarquiaAnonimo;
+		jerarquiaActual = _jerarquiaActual;
+		raizUrlAcceso = _raizUrlAcceso;
+		esAlumno = _esAlumno;
+		jerarquiaRaiz = _jerarquiaRaiz;
+		
+		TreeAdminCtrl[treeDiv].Jerarquias = [];
+
+		for (var i = 0; i < jerarquias.length; i++)
+		{
+			TreeAdminCtrl.addNode(TreeAdminCtrl[treeDiv], jerarquias[i]);
+		}
+
+		TreeAdminCtrl[treeDiv].tree.subscribe('clickEvent', function()
+		{
+			return false;
+		});
+		TreeAdminCtrl[treeDiv].tree.subscribe('collapseComplete', function()
+		{
+			genEvenOddBackgrounds();
+		});
+		TreeAdminCtrl[treeDiv].tree.subscribe('expandComplete', function()
+		{
+			genEvenOddBackgrounds();
+		});
+
+		TreeAdminCtrl[treeDiv].tree.draw();
+
+		hiddenSelected = DomGet(hiddenName);
+
+		/*var form = hiddenSelected;
+
+		while (form.tagName.toLowerCase() != 'form')
+		{
+		form = form.parentNode;
+		}*/
+		var form = hiddenSelected.form;
+
+		YAHOO.util.Event.addListener(form, 'submit',
+		function(e, args)
+		{
+			if (args.tree.selectedNode)
+			{
+				args.hd.value = args.tree.selectedNode.Jerarquia.IdJerarquia;
+			}
+		},
+		{hd: hiddenSelected, tree: TreeAdminCtrl[treeDiv]});
+	},
+
+	addNode: function (tree, jerarquia, addTo)
+	{
+		addTo = addTo ? addTo : ((jerarquia.Nivel == 0) ? rootNode : lastNode[jerarquia.Nivel - 1]);
+		
+		tree.Jerarquias[jerarquia.IdJerarquia] = jerarquia.Nombre;
+		widthDiv = 710 - jerarquia.Nivel * 18;
+		
+		textNode =  '<div class="treeAdm">';
+		nombre = jerarquia.Nombre;
+		if ( nombre.length > 52 )
+		{
+			lon = 49 - (jerarquia.Nivel * 3);
+			var nombre = nombre.substr(0, lon) + '...';
+		}
+		textNode += '	<div class="treeAdmTitulo"><span id="'+TreeAdminCtrl.sPrefElemTitJer+jerarquia.IdJerarquia+'">' + nombre + '</span></div>';
+		if(jerarquia.IdJerarquia < 99900)
+		{
+			textNode += '	<div class="treeAdmAcciones">';
+			// Acciones Institucionales
+			textNode += '		<span class="treeAdmAccionesInst">';
+			if (jerarquia.UrlAcceso)
+			{
+				textNode += to(Protocolo + jerarquia.UrlAcceso ,'Ir a la Home Institucional','home');
+				textNode += '<i class="material-icons md-24 light-blue-text text-darken-1" title="Banners" onclick="openPopup(\'' + Protocolo + jerarquia.UrlAcceso + '/administrar/banners/' + jerarquia.IdJerarquia + '/tree/1\')">photo_size_select_actual</i>';
+				//textNode += to('http://' + jerarquia.UrlAcceso + '/administrar/menu/' + jerarquia.IdJerarquia + '/' ,'Menu','menu');
+				if (esAlumno == 0)
+				{
+					textNode += to(Protocolo + jerarquia.UrlAcceso + '/visualizacion/' ,'Diseño de página','view_compact');
+					textNode += to(Protocolo + jerarquia.UrlAcceso + '/visualizacion/ordenar/contenidos/' ,'Ordenar Contenidos','format_list_numbered');
+				}
+				else
+				{
+					textNode += '<i class="material-icons md-24 grey-text text-lighten-1">view_compact</i>';
+					textNode += '<i class="material-icons md-24 grey-text text-lighten-1">format_list_numbered</i>';
+				}
+			}
+			else
+			{
+				textNode += '<i class="material-icons md-24 grey-text text-lighten-1">home</i>';
+				textNode += '<i class="material-icons md-24 grey-text text-lighten-1">photo_size_select_actual</i>';
+				//textNode += '<i class="material-icons md-24 grey-text text-lighten-1">menu</i>';
+				textNode += '<i class="material-icons md-24 grey-text text-lighten-1">view_compact</i>';
+				textNode += '<i class="material-icons md-24 grey-text text-lighten-1">format_list_numbered</i>';
+			}
+			textNode += '		</span>';
+			if (jerarquia.UrlAcceso == null || jerarquia.UrlAcceso == '')
+			{
+				jerarquia.UrlAcceso = raizUrlAcceso;
+			}
+			// Acciones Servicios
+			textNode += '		<span class="treeAdmAccionesServ">';
+			textNode += to(Protocolo + jerarquia.UrlAcceso + '/servicio/new/' + jerarquia.IdJerarquia + '/' ,'Nuevo Servicio','add');
+		    textNode += '<i class="material-icons md-24 light-blue-text text-darken-1" onclick="openPopup(\'/administrar/servicios/' + jerarquia.IdJerarquia + '/tree_todos_0_0/\')" title="Ver Servicios">folder_open</i>';
+			//textNode += '<img border="0" onclick="openPopup(\'/administrar/servicios/' + jerarquia.IdJerarquia + '_dd/tree_todos_0_0/\')" src="/static/images/verserviciosdd.gif" alt="Ver Servicios incluyendo jerarquias interiores" title="Ver Servicios incluyendo jerarquias interiores" />';
+				textNode += '<span style="width:16px;height:16px;display:inline-block;"></span>'
+			textNode += '		</span>';
+		
+			// Acciones Jerarquias
+			textNode += '		<span class="treeAdmAccionesJera">';
+                        var cant=JerarquiasSedes.length;
+                        var puedeabm=false;
+                        for (i=1; i<=cant;i++)
+                        {
+                            if (JerarquiasSedes[i]==jerarquiaActual)
+                            {
+                                puedeabm=true;
+                            }
+                        }
+                        if (puedeabm)
+                        {
+                            textNode += to(Protocolo + jerarquia.UrlAcceso + '/jerarquia/new/' + jerarquia.IdJerarquia + '/' ,'Crear jerarquia','equalizer');
+                        }
+                        else
+                        {
+                            textNode += '<i class="material-icons md-24 grey-text text-lighten-1">equalizer</i>';
+                        }
+			if ( ( (jerarquia.IdJerarquia != jerarquiaActual) || (jerarquia.IdJerarquia == jerarquiaRaiz) ) && (jerarquia.IdJerarquia != anId) && (puedeabm))
+			{
+				textNode += to(Protocolo + jerarquia.UrlAcceso + '/jerarquia/edit/' + jerarquia.IdJerarquia + '/' ,'Editar jerarquia','edit');
+			}
+			else
+			{
+				textNode += '<i class="material-icons md-24 grey-text text-lighten-1">edit</i>';
+			}
+		
+			if ( !jerarquia.Externo && (puedeabm) )
+			{
+				textNode += '<i class="material-icons md-24 light-blue-text text-darken-1" onclick="EliminarJerarquia(' + jerarquia.IdJerarquia + ')" title="Eliminar jeraquia">delete</i>';
+			}
+			else
+			{
+				textNode += '<i class="material-icons md-24 grey-text text-lighten-1">delete</i>';
+			}
+			
+			textNode += '<img id="fav_'+jerarquia.IdJerarquia+'" onclick="FavoriteJerarquia('+jerarquia.IdJerarquia+')" src="/static/images/favorite'+(addTo.IdJerarquia==99997?'_remove':'')+'.png" title="'+(addTo.IdJerarquia==99997?'Eliminar de':'Agregar a')+' Jerarquías Favoritas" border="0"/>';
+		
+			textNode += '		</span>';
+		
+			textNode += '	</div>';
+		}
+		textNode += '</div>';
+
+		var node = lastNode[jerarquia.Nivel] = new YAHOO.widget.TextNode(textNode , addTo, jerarquia.Nivel == 0);
+		node.IdJerarquia = jerarquia.IdJerarquia;
+		node.isLeaf = jerarquia.isLeaf;
+		node.contentStyle = jerarquia.IsPrincipal ? 'principal' : 'noprincipal';
+
+		if(jerarquia.Nivel == 0)
+		{
+			node.dynamicLoadComplete = true;
+		}
+
+		// Guardo la relacion IdJerarquia - IndiceTree
+		TreeAdminCtrl.oRelIndIdJer[jerarquia.IdJerarquia] = node.index;
+
+		node.Jerarquia = jerarquia;
+		
+		return node;
+	},
+	getJerarquiasHijas: function (node, fnLoadComplete)
+	{
+	    var callback = { success: succes, scope: this };
+	    var prm = 'i=' + node.Jerarquia.IdJerarquia + '&n=' + node.Jerarquia.Nivel;
+
+	    YAHOO.util.Connect.asyncRequest('POST', '/ajaxactions/getJerarquiasHijasParaTree', callback, prm);
+
+	    function succes(o)
+	    {
+			var oResults = eval("(" + o.responseText + ")");
+			if(oResults.ResultSet.Result.length) {
+				for (var i=0; i<oResults.ResultSet.Result.length; i++) {
+					var jerarquia = oResults.ResultSet.Result[i];
+					//if(node.tree.getNodeByProperty('IdJerarquia',jerarquia.IdJerarquia) == null)
+					{
+						TreeAdminCtrl.addNode(TreeAdminCtrl[node.tree.id], jerarquia, node);
+					}
+				}
+			}
+	    	fnLoadComplete();
+	    }
+	}
+}
+
+function to(url,alt,src)
+{
+	//return '<img border="0" onclick="go(\'' + url + '\')" src="' + src + '" alt="' + alt + '" title="' + alt + '" />';
+	//return '<a href="' + url + '" title="' + alt + '"><img border="0" src="' + src + '" alt="' + alt + '" /></a>';
+    return '<a href="' + url + '" title="' + alt + '"><i class="material-icons md-24">' + src + '</i></a>';
+}
+
+function go(url)
+{
+	window.location = url;
+}
+
+function genEvenOddBackgrounds()
+{
+	$('.ygtvtable', '#treeDiv_TreeJerarquias').filter(':visible').filter(':odd') .css('background', '#FDFDFD');
+	$('.ygtvtable', '#treeDiv_TreeJerarquias').filter(':visible').filter(':even').css('background', '#E2E2E2');
+}

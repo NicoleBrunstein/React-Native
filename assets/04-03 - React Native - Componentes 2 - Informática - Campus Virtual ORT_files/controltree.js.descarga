@@ -1,0 +1,232 @@
+//aliases 
+var Dom = YAHOO.util.Dom;
+var DomGet = Dom.get;
+//namespace TreeCtrl
+var TreeCtrl =
+{
+	init: function(treeDiv, jerarquias, selected, hiddenName, funcList, onClick, toggleSelection, selectedInMine)
+	{
+		onClick = onClick || false;
+
+		TreeCtrl[treeDiv] = {};
+		TreeCtrl[treeDiv].tree = new YAHOO.widget.TreeView(treeDiv);
+		TreeCtrl.JerSelecc = false;
+		TreeCtrl.onClick = onClick;
+		TreeCtrl.toggleSelection = toggleSelection;
+                TreeCtrl.section = '';
+        TreeCtrl[treeDiv].tree.setDynamicLoad(TreeCtrl.getJerarquiasHijas);
+
+		var rootNode = TreeCtrl[treeDiv].tree.getRoot();
+		var jerarquia, addTo, node, lastNode = [];
+
+		TreeCtrl[treeDiv].toSelect = selected;
+		
+		TreeCtrl[treeDiv].Jerarquias = [];
+
+		for (var i = 0; i < jerarquias.length; i++)
+		{
+			jerarquia = jerarquias[i];
+
+			TreeCtrl[treeDiv].Jerarquias[jerarquia.IdJerarquia] = jerarquia.Nombre;
+
+			addTo = (jerarquia.Nivel == 0) ? rootNode : lastNode[jerarquia.Nivel - 1];
+
+			var expand = jerarquia.forceExpand || (selected ? (selectedInMine ? jerarquia.IdJerarquia > 99900 : (selected == jerarquia.IdJerarquia ? false : jerarquia.IdJerarquia != 99999)) : jerarquia.Nivel == 1);
+
+			if(jerarquia.forceCollapse === true)
+				expand = false;
+			
+			node = lastNode[jerarquia.Nivel] = new YAHOO.widget.TextNode(jerarquia.Nombre, addTo, expand);
+			node.Jerarquia = jerarquia;
+			node.IdJerarquia = jerarquia.IdJerarquia;
+			node.isLeaf = jerarquia.isLeaf;
+			node.contentStyle = jerarquia.IsPrincipal ? 'principal' : 'noprincipal';
+			
+			if(node.IdJerarquia == TreeCtrl[treeDiv].toSelect)
+			{
+				TreeCtrl[treeDiv].toSelectNode = node;
+				Dom.addClass(TreeCtrl[treeDiv].toSelectNode.labelElId, 'ygtvlabelSelected');
+				TreeCtrl[treeDiv].selectedNode = TreeCtrl[node.tree.id].toSelectNode;
+			}
+		}
+
+		if(TreeCtrl[treeDiv].selectedNode)
+		{
+			TreeCtrl[treeDiv].selectedNode.highlight();
+		}
+
+		TreeCtrl[treeDiv].tree.subscribe('highlightEvent',
+		function()
+		{
+			var hd = DomGet(hiddenName);
+			var tree = TreeCtrl[treeDiv];
+			if (tree.selectedNode != undefined)
+			{
+				hd.value = tree.selectedNode.Jerarquia.IdJerarquia;
+			}
+		});
+
+		TreeCtrl[treeDiv].tree.subscribe('clickEvent',
+		function(n)
+		{
+                    
+			if (TreeCtrl[treeDiv].selectedNode)
+			{
+				Dom.removeClass(TreeCtrl[treeDiv].selectedNode.getLabelEl(), 'ygtvlabelSelected');
+			}
+
+			var permToggSel = true;
+
+			if (TreeCtrl.toggleSelection && TreeCtrl.JerSelecc)
+            {
+				if (n.node.Jerarquia.IdJerarquia == TreeCtrl.JerSelecc.Jerarquia.IdJerarquia)
+                {
+					permToggSel = false;
+
+					TreeCtrl[treeDiv].selectedNode = false;
+
+					TreeCtrl.JerSelecc = false;
+                }
+               
+            }
+
+			if(permToggSel)
+			{
+				TreeCtrl[treeDiv].selectedNode = n.node;
+
+				// Propiedad que referencia al Nodo seleccionado del arbol
+				TreeCtrl.JerSelecc = n.node;
+                               
+				Dom.addClass(n.node.getLabelEl(), 'ygtvlabelSelected');
+
+				if(funcList)
+				{
+					ListItemsFromJer(n.node);
+				}
+
+				if (TreeCtrl.onClick != false)
+				{
+					eval(TreeCtrl.onClick + '()');
+				}
+	
+	            if (TreeCtrl.section == 'cursoMateria')
+	            {
+	                TreeCtrl.getNameJerByCoordCurso();
+	
+	            }
+			}
+
+			return false;
+		});
+
+		TreeCtrl[treeDiv].tree.draw();
+
+		hiddenSelected = DomGet(hiddenName);
+
+		/*var form = hiddenSelected;
+
+		while (form.tagName.toLowerCase() != 'form')
+		{
+		form = form.parentNode;
+		}*/
+		var form = hiddenSelected.form;
+
+		YAHOO.util.Event.addListener(form, 'submit',
+		function(e, args)
+		{
+			if (args.tree.selectedNode != undefined)
+			{
+				args.hd.value = args.tree.selectedNode.Jerarquia.IdJerarquia;
+			}
+		},
+		{hd: hiddenSelected, tree: TreeCtrl[treeDiv]});
+	},
+
+	getJerSelecc: function()
+	{
+		if(TreeCtrl.JerSelecc.Jerarquia)
+		{
+			return TreeCtrl.JerSelecc.Jerarquia.IdJerarquia;
+		}
+		return false;
+	},
+
+    getNameJerByCoordCurso: function()
+    {
+        var callback =
+        {
+            success: succes,
+            scope: this
+        },
+        //prm = 'i='+TreeCtrl.JerSelecc.Jerarquia.IdJerarquia;
+        jerarquiaselected = TreeCtrl.getJerSelecc();
+        prm = 'i='+ jerarquiaselected;
+
+        YAHOO.util.Connect.asyncRequest('POST', '/ajaxactions/getCursoMateriasByIdJerarquia', callback, prm);
+
+        function succes(o)
+        {
+            document.getElementById('LabelHierarchyName').innerHTML = o.responseText;
+        }
+    },
+
+    saveTreeMaterias: function()
+    {
+       var callback =
+       {
+            scope: this
+       },
+        jerarquiaselected = TreeCtrl.getJerSelecc();
+        prm = 'i='+ jerarquiaselected;
+     
+       YAHOO.util.Connect.asyncRequest('POST', '/ajaxactions/createJerarquiasXMaterias', callback ,prm);
+
+       alert("Categorias creadas");
+    },
+
+    getJerarquiasHijas: function(node, fnLoadComplete)
+    {
+        var callback = { success: succes, scope: this };
+        var prm = 'i=' + node.Jerarquia.IdJerarquia + '&n=' + node.Jerarquia.Nivel;
+
+        YAHOO.util.Connect.asyncRequest('POST', '/ajaxactions/getJerarquiasHijasParaTree', callback, prm);
+
+        function succes(o)
+        {
+			var oResults = eval("(" + o.responseText + ")");
+			if(oResults.ResultSet.Result.length) {
+				for (var i=0; i<oResults.ResultSet.Result.length; i++) {
+					var jerarquia = oResults.ResultSet.Result[i];
+					var otro = node.tree.getNodeByProperty('IdJerarquia',jerarquia.IdJerarquia);
+					if(otro != null)
+					{
+						if(otro.parent == node || otro.Jerarquia.Nivel == 1)
+							continue;
+					}
+					var tempNode = new YAHOO.widget.TextNode(jerarquia.Nombre, node, false);
+					tempNode.Jerarquia = jerarquia;
+					tempNode.IdJerarquia = jerarquia.IdJerarquia;
+					tempNode.isLeaf = jerarquia.isLeaf;
+					tempNode.contentStyle = jerarquia.IsPrincipal ? 'principal' : 'noprincipal';
+					if(tempNode.IdJerarquia == TreeCtrl[node.tree.id].toSelect)
+					{
+						TreeCtrl[node.tree.id].toSelectNode = tempNode;
+						TreeCtrl[node.tree.id].toSelect = null;
+					}
+				}
+			}
+        	fnLoadComplete();
+
+			if(TreeCtrl[node.tree.id].toSelectNode)
+			{
+				Dom.addClass(TreeCtrl[node.tree.id].toSelectNode.labelElId, 'ygtvlabelSelected');
+				TreeCtrl[node.tree.id].selectedNode = TreeCtrl[node.tree.id].toSelectNode;
+
+				if(TreeCtrl[node.tree.id].selectedNode)
+				{
+					TreeCtrl[node.tree.id].selectedNode.highlight();
+				}
+			}
+        }
+    }
+}

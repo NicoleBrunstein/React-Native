@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<!-- saved from url=(0106)https://campus.ort.edu.ar/secundaria/almagro/informatica/articulo/2121278/04-03-react-native-componentes-2 -->
+<html lang="es" class="notranslate"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta http-equiv="origin-trial" content="A/kargTFyk8MR5ueravczef/wIlTkbVk1qXQesp39nV+xNECPdLBVeYffxrM8TmZT6RArWGQVCJ0LRivD7glcAUAAACQeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZS5jb206NDQzIiwiZmVhdHVyZSI6IkRpc2FibGVUaGlyZFBhcnR5U3RvcmFnZVBhcnRpdGlvbmluZzIiLCJleHBpcnkiOjE3NDIzNDIzOTksImlzU3ViZG9tYWluIjp0cnVlLCJpc1RoaXJkUGFydHkiOnRydWV9"><style class="vjs-styles-defaults">
+      .video-js {
+        width: 300px;
+        height: 150px;
+      }
+
+      .vjs-fluid {
+        padding-top: 56.25%
+      }
+    </style>
+                    <!-- Global site tag (gtag.js) - Google Analytics -->
+            <script type="text/javascript" async="" charset="utf-8" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/recaptcha__es.js.descarga" crossorigin="anonymous" integrity="sha384-CXKxadFUrbQa4JC5OHq4ZpjZw2a79dPZ3VqilAObPr4a7+81wH6eMwpeqQsf/u06"></script><script async="" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/js"></script>
+            <script>
+                window.dataLayer = window.dataLayer || [];
+
+                function gtag() {
+                    dataLayer.push(arguments);
+                }
+
+                gtag('js', new Date());
+
+                gtag('config', 'G-Z4YD9X4VXX');
+            </script>
+                <!-- Servido desde 10.1.11.6 -->
+        <!--<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE8" />-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT</title>
+        
+                    <meta name="application-name" content="Campus Virtual ORT">
+                    <meta name="msapplication-tooltip" content="Campus Virtual ORT">
+                    <meta name="msapplication-starturl" content="/">
+                    <meta name="msapplication-task" id="escri" content="name=Mi escritorio;action-uri=/homepersonal/;icon-uri=/static/images/homepersonal.ico">
+                    <meta name="msapplication-task" id="amig" content="name=Amigos;action-uri=/amigos/;icon-uri=/static/images/amigos.ico">
+                    <meta name="msapplication-task" id="produ" content="name=Mis producciones;action-uri=/misproducciones/;icon-uri=/static/images/imgarticulo.ico">
+                    <meta name="description" content="04-03 - React Native - Componentes 2">
+                <script type="text/javascript">
+            var SiteUrl = 'https://campus.ort.edu.ar';
+            var Estaticos = 'https://recursos.ort.edu.ar';
+            var CurrentSite = 'https://campus.ort.edu.ar';
+            var Protocolo = (document.location.protocol == 'https:' ? 'https://' : 'http://');
+        </script>
+        <link rel="shortcut icon" href="https://recursos.ort.edu.ar/static/images/favicon.ico">
+
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/yahoo-dom-event.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/connection-min.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/container_core-min.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/container-min.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/animation-min.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/menu-min.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/utilities.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/button-min.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/treeview.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/json-min.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/datasource-min.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/autocomplete-min.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/jquery.min.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/materialize.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/materialize_personalizado.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/materialize.clockpicker.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/functions.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/md5.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/popupsdivs.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/controltree.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/controladmintree.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/buscajerarquia.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/autocompleteort.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/cursordivscroll.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/WIRISplugins.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/jquery.fancybox.pack.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/jquery.fancybox-buttons.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/jquery.fancybox-thumbs.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/jquery.fancybox-media.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/owl.carousel.min.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/h5p-resizer.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/get-min.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/login.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/player.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/video.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/videojs-ie8.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/boxmanager.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/viewer.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/treeselection.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/jsvalidator.js.descarga"></script>
+                    <script type="text/javascript" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/api.js.descarga"></script>
+        
+                    <script type="text/javascript">GetLoggedInData()</script>
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/treeview.css">
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/autocomplete.css">
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/azul.css">
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/header_menu.css">
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/contenedor.css">
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/vista_contenido.css">
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/tps.css">
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/videos.css">
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/materialicons.css">
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/materialize.css">
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/styles.css">
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/styles2.css">
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/menu_operation.css">
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/home_servicios.css">
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/controlpermisos.css">
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/print.css" media="print?t=">
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/materialize.clockpicker.css">
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/all.css">
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/micampusvirtual.css">
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/jquery.fancybox.css">
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/jquery.fancybox-buttons.css">
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/jquery.fancybox-thumbs.css">
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/owl.carousel.min.css">
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/owl.theme.default.min.css">
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/container.css">
+                    <link rel="stylesheet" type="text/css" href="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/video-js.css">
+            <script src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/ViewSDKInterface.js.descarga"></script><style type="text/css">.ViewSDK_hideOverflow {
+        overflow: hidden;
+    }</style><style type="text/css">.ViewSDK_parentRelativeWidth {
+        width: 100%;
+    }</style><style type="text/css">.ViewSDK_viewportRelativeWidth {
+        width: 100vw;
+    }</style><style type="text/css">.ViewSDK_parentRelativeHeight {
+        height: 100%;
+    }</style><style type="text/css">.ViewSDK_viewportRelativeHeight {
+        height: 100vh;
+    }</style><style type="text/css">.ViewSDK_fullScreenPDFViewer {
+        width:100vw !important; height:100vh !important;
+        max-width:100vw !important; max-height:100vh !important;
+        position:fixed; top:0; left:0; z-index:99999;
+        margin: 0 !important; padding: 0 !important;
+        border: none !important;
+    }</style><style type="text/css">:root { --ViewSDK-mobile-viewport-height:1vh; }</style><style type="text/css">.ViewSDK_fullScreenPDFViewerMobile {
+        width:100vw !important; height:calc(100 * var(--ViewSDK-mobile-viewport-height)) !important;
+        max-width:100vw !important; max-height:calc(100 * var(--ViewSDK-mobile-viewport-height)) !important;
+        position:fixed; top:0; left:0; z-index:99999;
+        margin: 0 !important; padding: 0 !important;
+        border: none !important;
+    }</style><style type="text/css">.ViewSDK_hideOverflow {
+        overflow: hidden;
+    }</style><style type="text/css">.ViewSDK_parentRelativeWidth {
+        width: 100%;
+    }</style><style type="text/css">.ViewSDK_viewportRelativeWidth {
+        width: 100vw;
+    }</style><style type="text/css">.ViewSDK_parentRelativeHeight {
+        height: 100%;
+    }</style><style type="text/css">.ViewSDK_viewportRelativeHeight {
+        height: 100vh;
+    }</style><style type="text/css">.ViewSDK_fullScreenPDFViewer {
+        width:100vw !important; height:100vh !important;
+        max-width:100vw !important; max-height:100vh !important;
+        position:fixed; top:0; left:0; z-index:9999;
+        margin: 0 !important; padding: 0 !important;
+        border: none !important;
+    }</style><style type="text/css">.ViewSDK_LBFullScreenPDFViewer {
+        width:100vw !important; height:100vh !important;
+        max-width:100vw !important; max-height:100vh !important;
+        position:fixed; top:0; left:0; z-index:10000;
+        margin: 0 !important; padding: 0 !important;
+        background-color: rgba(0, 0, 0, 0.2);
+        border: none !important;
+    }</style><style type="text/css">:root { --ViewSDK-mobile-viewport-height:1vh; }</style><style type="text/css">.ViewSDK_fullScreenPDFViewerMobile {
+        width:100vw !important; height:calc(100 * var(--ViewSDK-mobile-viewport-height)) !important;
+        max-width:100vw !important; max-height:calc(100 * var(--ViewSDK-mobile-viewport-height)) !important;
+        position:fixed; top:0; left:0; z-index:9999;
+        margin: 0 !important; padding: 0 !important;
+        border: none !important;
+    }</style><style type="text/css">.ViewSDK_LBLoader {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        z-index: 10000;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #1473E6;
+        width: 56px !important;
+        height: 56px !important;
+        margin: -32px 0 0 -32px;
+        border-radius: 50%;
+        -webkit-animation: lbSpin 2s linear infinite;
+        animation: lbSpin 2s linear infinite;
+    }
+    @-webkit-keyframes lbSpin {
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
+    }
+    @keyframes lbSpin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }</style><style type="text/css">.fancybox-margin{margin-right:17px;}</style></head>
+
+    <body id="body" class=" yui-skin-sam grey lighten-2">
+    <div id="contCuadLogin" class="hiddenDiv">
+        <div class="hd"></div>
+        <div class="bd" id="bodyPopUpDiv"></div>
+    </div>
+
+    
+    <input type="hidden" id="wsk" name="wsk" value="66a7a36ca4ecd">
+    <div class="">
+        <div id="_headerSitio" class="headerSitio">
+            <div class="navbar-fixed" id="navPrincipal">
+                <nav class="row encTopNavbarCampus">
+                    <div class="nav-wrapper white">
+
+                                                    <div class="encDivLogo">
+                                <a href="https://campus.ort.edu.ar/">
+                                    <h1 class="hide">Campus Virtual ORT</h1>
+                                </a>
+                            </div>
+
+                        <ul class="col s7 encULMenu"><li class="encDropdownMenu"><div class="encDropButton">Primaria<i class="displayInlineBlock material-icons">keyboard_arrow_down</i></div><ul class="encDropdownContentMenu"><li><a class="" href="https://campus.ort.edu.ar/primaria/">Propuesta Educativa</a></li><li><a class="" href="https://campus.ort.edu.ar/primaria/tigre">Sede Tigre</a></li><li><a class="" href="https://campus.ort.edu.ar/primaria/almagro">Sede Almagro</a></li><li><a class="" href="https://campus.ort.edu.ar/primaria/belgrano">Sede Belgrano</a></li></ul></li><li class="encDropdownMenu"><div class="encDropButton">Secundaria<i class="displayInlineBlock material-icons">keyboard_arrow_down</i></div><ul class="encDropdownContentMenu"><li><a class="" href="https://campus.ort.edu.ar/secundaria">Propuesta Educativa</a></li><li><a class="" href="https://campus.ort.edu.ar/secundaria/almagro">Sede Almagro</a></li><li><a class="" href="https://campus.ort.edu.ar/secundaria/belgrano">Sede Belgrano</a></li><li><a class="" href="https://campus.ort.edu.ar/secundaria/rosario">Modelo Educativo ORT en Rosario</a></li></ul></li><li class="encDropdownMenu"><div class="encDropButton">Terciario<i class="displayInlineBlock material-icons">keyboard_arrow_down</i></div><ul class="encDropdownContentMenu"><li><a class="" href="https://campus.ort.edu.ar/terciario">Carreras</a></li><li><a class="" href="https://campus.ort.edu.ar/terciario/almagro">Sede Almagro</a></li><li><a class="" href="https://campus.ort.edu.ar/terciario/belgrano">Sede Belgrano</a></li></ul></li><li class="encDropdownMenu"><div class="encDropButton">Extensión<i class="displayInlineBlock material-icons">keyboard_arrow_down</i></div><ul class="encDropdownContentMenu"><li><a class="" href="https://campus.ort.edu.ar/alumni">Alumni</a></li><li><a class="" href="https://campus.ort.edu.ar/comunic">Comunicación Institucional</a></li><li><a class="" href="https://campus.ort.edu.ar/laboral">Inserción Laboral</a></li><li><a class="" href="https://campus.ort.edu.ar/rrhh">Recursos Humanos</a></li><li><a class="" href="https://campus.ort.edu.ar/unidaddecapacitacion">Unidad de Capacitación</a></li></ul></li><li class="encItemMenuSingle"><a href="https://crea.ort.edu.ar/">CREA</a></li><li class="encItemMenuSingle"><a href="https://editorial.ort.edu.ar/">Editorial ORT</a></li></ul>
+                        <!--Botones header -->
+                        <div class="col s4" id="botoneraRight">
+                                <ul class="botoneraMenu contenedorBotoneraRight">             <li class="nombreUsuarioLogueado valign-wrapper">
+                <a href="https://campus.ort.edu.ar/miperfil/">
+                    <img id="imagenPerfil" class="circle imgUsuarioLogueado" src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/avatar.gif" alt="Contact Persona">
+                </a>
+                <a href="https://campus.ort.edu.ar/miperfil/">
+                    <span class="cajaLoginNombre indigo-text">Nicole<br>Brunstein</span>                </a>
+            </li>
+                            <li><a id="btnNotificacionesNavbar" class="valign-wrapper" href="https://campus.ort.edu.ar/notificaciones" title="Sin notificaciones"><i class="material-icons md-dark">notifications</i></a></li>
+                        <li><a id="btnMenu" data-activates="subMenues" class="button-collapse right show-on-large"><i class="material-icons md-dark">menu</i></a></li>     </ul>                         </div>
+                        <!-- Fin Botones Header -->
+
+                        <!-- Menu lateral -->
+
+                        <ul class="side-nav collapsible right-aligned" id="subMenues" data-collapsible="accordion" style="transform: translateX(100%);">
+                            <li class="sidenav-contenedorIconoySpan"><div><a href="https://campus.ort.edu.ar/dashboard/"><i class="material-icons-checklist center-align">&nbsp;</i><span>Dashboard</span></a></div></li><li class="sidenav-contenedorIconoySpan"><div><a href="https://campus.ort.edu.ar/secundaria/almagro/informatica/2024-ni5c"><i class="material-icons-class center-align">&nbsp;</i><span>Mi Curso</span></a></div></li><li class="sidenav-contenedorIconoySpan"><div><a href="https://campus.ort.edu.ar/miscontenidos/"><i class="material-icons-create center-align">&nbsp;</i><span>Mis Contenidos</span></a></div></li><li class="sidenav-contenedorIconoySpan"><div><a href="https://campus.ort.edu.ar/grupos/"><i class="material-icons-group center-align">&nbsp;</i><span>Grupos</span></a></div></li><li class="sidenav-contenedorIconoySpan"><div><a href="https://campus.ort.edu.ar/mensajes"><i class="material-icons-message center-align">&nbsp;</i><span>Mensajes</span></a></div></li><li class="sidenav-contenedorIconoySpan"><div><a href="https://campus.ort.edu.ar/supercontenidos/"><i class="material-icons-slide-library center-align">&nbsp;</i><span>SuperContenidos</span></a></div></li><li class="sidenav-contenedorIconoySpan"><div><a href="https://campus.ort.edu.ar/filemanager/"><i class="material-icons-cloud-upload center-align">&nbsp;</i><span>Disco Z</span></a></div></li><li class="sidenav-contenedorIconoySpan " id="favoritos"></li><li class="sidenav-contenedorIconoySpan"><div class="collapsible-header width100"><i class="material-icons-bookmark-added center-align">&nbsp;</i><span>Cursos anteriores</span><i class="material-icons sidenav-arrowDesplegable">keyboard_arrow_down</i></div><div class="collapsible-body width100" style=""><div><a href="https://campus.ort.edu.ar/secundaria/almagro/informatica/2023-ni4c" class="itemMenu">2023 -  NI4C</a></div><div><a href="https://campus.ort.edu.ar/secundaria/almagro/segundo-n/2021-ne2p" class="itemMenu">2021 -  NE2P</a></div><div><a href="https://campus.ort.edu.ar/secundaria/almagro/primero-n/2020-ne1p" class="itemMenu">2020 -  NE1P</a></div></div></li><li class="sidenav-contenedorIconoySpan"><div><a href="https://campus.ort.edu.ar/missuscripciones"><i class="material-icons-mark-email-unread center-align">&nbsp;</i><span>Suscripciones</span></a></div></li><li class="sidenav-contenedorIconoySpan"><div><a href="https://campus.ort.edu.ar/servicio/treeview/1718466"><i class="material-icons-help center-align">&nbsp;</i><span>Guía para estudiantes</span></a></div></li><li class="sidenav-contenedorIconoySpan"><div><a href="https://campus.ort.edu.ar/miperfil/"><i class="material-icons-person center-align">&nbsp;</i><span>Mi Perfil</span></a></div></li><li class="sidenav-contenedorIconoySpan"><div><a href="https://campus.ort.edu.ar/logout"><i class="material-icons-logout center-align">&nbsp;</i><span>Cerrar sesión</span></a></div></li>                                <hr class="hr-rounded">                                 <!-- Menu ORT -->
+                                <div id="menuSecciones">
+                                    <ul class="collapsible seccionMenuLateral backgroundWhite" data-collapsible="accordion"><li><div class="collapsible-header textoSeccionMenuLateral arrowMenu">Primaria<i class="material-icons sidenav-arrowDesplegable">keyboard_arrow_down</i></div><div class="collapsible-body" style=""><div class=""><a class="itemMenu" href="https://campus.ort.edu.ar/primaria/">Propuesta Educativa</a></div></div><div class="collapsible-body" style=""><div class=""><a class="itemMenu" href="https://campus.ort.edu.ar/primaria/tigre">Sede Tigre</a></div></div><div class="collapsible-body" style=""><div class=""><a class="itemMenu" href="https://campus.ort.edu.ar/primaria/almagro">Sede Almagro</a></div></div><div class="collapsible-body" style=""><div class=""><a class="itemMenu" href="https://campus.ort.edu.ar/primaria/belgrano">Sede Belgrano</a></div></div></li><li><div class="collapsible-header textoSeccionMenuLateral arrowMenu">Secundaria<i class="material-icons sidenav-arrowDesplegable">keyboard_arrow_down</i></div><div class="collapsible-body" style=""><div class=""><a class="itemMenu" href="https://campus.ort.edu.ar/secundaria">Propuesta Educativa</a></div></div><div class="collapsible-body" style=""><div class=""><a class="itemMenu" href="https://campus.ort.edu.ar/secundaria/almagro">Sede Almagro</a></div></div><div class="collapsible-body" style=""><div class=""><a class="itemMenu" href="https://campus.ort.edu.ar/secundaria/belgrano">Sede Belgrano</a></div></div><div class="collapsible-body" style=""><div class=""><a class="itemMenu" href="https://campus.ort.edu.ar/secundaria/rosario">Modelo Educativo ORT en Rosario</a></div></div></li><li><div class="collapsible-header textoSeccionMenuLateral arrowMenu">Terciario<i class="material-icons sidenav-arrowDesplegable">keyboard_arrow_down</i></div><div class="collapsible-body" style=""><div class=""><a class="itemMenu" href="https://campus.ort.edu.ar/terciario">Carreras</a></div></div><div class="collapsible-body" style=""><div class=""><a class="itemMenu" href="https://campus.ort.edu.ar/terciario/almagro">Sede Almagro</a></div></div><div class="collapsible-body" style=""><div class=""><a class="itemMenu" href="https://campus.ort.edu.ar/terciario/belgrano">Sede Belgrano</a></div></div></li><li><div class="collapsible-header textoSeccionMenuLateral arrowMenu">Extensión<i class="material-icons sidenav-arrowDesplegable">keyboard_arrow_down</i></div><div class="collapsible-body" style=""><div class=""><a class="itemMenu" href="https://campus.ort.edu.ar/alumni">Alumni</a></div></div><div class="collapsible-body" style=""><div class=""><a class="itemMenu" href="https://campus.ort.edu.ar/comunic">Comunicación Institucional</a></div></div><div class="collapsible-body" style=""><div class=""><a class="itemMenu" href="https://campus.ort.edu.ar/laboral">Inserción Laboral</a></div></div><div class="collapsible-body" style=""><div class=""><a class="itemMenu" href="https://campus.ort.edu.ar/rrhh">Recursos Humanos</a></div></div><div class="collapsible-body" style=""><div class=""><a class="itemMenu" href="https://campus.ort.edu.ar/unidaddecapacitacion">Unidad de Capacitación</a></div></div></li><li><div class="collapsible-header textoSeccionMenuLateral"><a href="https://crea.ort.edu.ar/">CREA</a></div></li><li><div class="collapsible-header textoSeccionMenuLateral"><a href="https://editorial.ort.edu.ar/">Editorial ORT</a></div></li></ul>                                </div>
+                                <!-- Fin Menu ORT -->
+                                                    </ul><!-- Fin class SideNav -->
+                                    </div>
+
+            </nav><!-- fin nav rol navigation-->
+        </div>
+            </div> <!-- fin id _headerSitio -->
+
+    <div id="_bodySitio" class="container bodySitio margBodyLogged">
+        <div class="bodyContenedor">
+            <div class="margTopBody"></div>            <div>
+                <input type="hidden" name="_titleRss" id="_titleRss" value="2024 Articulos - React Native 5IC">
+<input type="hidden" id="_titleRss" value="04-03 - React Native - Componentes 2">
+<div id="visualizationBase" style="display: none;">
+<div id="treeVisualization">
+				<div class="popupPageBotonera">
+					<div class="filtrosAdm strong" style="margin:0;">
+						<div class="floatRight" id="opcVerUltCont">
+							
+							<input type="checkbox" id="chkVerUltimosCont" onclick="TreeSelection.CopiarMoverContenido(0); return false;">
+                            <label class="lblVerUltCont" id="lblOpcUltCont" for="chkVerUltimosCont">Ver mis últimos servicios</label>
+						</div>
+					</div>
+					<span class="popupPageTitBox">Seleccione el servicio en el que va a <span id="txtActSel">copiar</span> el contenido "04-03 - React Native - Componentes 2"</span>
+				</div>
+				<div class="popupPageContenido">
+	<input type="hidden" id="infoServicio" value="">
+	<input type="hidden" id="accionClickeada" value="">
+	<table class="administrarTable" cellspacing="0">
+		<tbody><tr>
+			<td class="administrarTitulo">Jerarquia</td>
+			<td class="administrarTitulo">
+						&nbsp;
+			</td>
+			
+		</tr>
+		<tr>
+			<td colspan="3">
+				<div id="visTree_contGlobTree" class="administracion">
+					<div id="CopiarMoverCont" class="JAMControlTree"><div class="ygtvitem ygtv-item" id="ygtv0"><div class="ygtvchildren" id="ygtvc0"><div class="ygtvitem ygtv-item" id="ygtv1"><table id="ygtvtableel1" border="0" cellpadding="0" cellspacing="0" class="ygtvtable ygtvdepth0 ygtv-highlight0"><tbody><tr class="ygtvrow"><td id="ygtvt1" class="ygtvcell ygtvtm"><a href="https://campus.ort.edu.ar/secundaria/almagro/informatica/articulo/2121278/04-03-react-native-componentes-2#" class="ygtvspacer"><i class="material-icons add">add</i><i class="material-icons remove">remove</i><i class="material-icons loading">refresh</i></a></td><td id="ygtvcontentel1" class="ygtvcell noprincipal ygtvcontent"><span id="ygtvlabelel1" class="ygtvlabel"><div class="treeAdm">	<div class="treeAdmTitulo"><span id="J_99999" onclick="TreeSelection.CopiarMoverContenido(99999)">Jerarquías</span></div></div></span></td></tr></tbody></table><div class="ygtvchildren" id="ygtvc1"><div class="ygtvitem ygtv-item" id="ygtv2"><table id="ygtvtableel2" border="0" cellpadding="0" cellspacing="0" class="ygtvtable ygtvdepth1 ygtv-highlight0"><tbody><tr class="ygtvrow"><td class="ygtvcell ygtvblankdepthcell"><div class="ygtvspacer"></div></td><td id="ygtvt2" class="ygtvcell ygtvtp"><a href="https://campus.ort.edu.ar/secundaria/almagro/informatica/articulo/2121278/04-03-react-native-componentes-2#" class="ygtvspacer"><i class="material-icons add">add</i><i class="material-icons remove">remove</i><i class="material-icons loading">refresh</i></a></td><td id="ygtvcontentel2" class="ygtvcell noprincipal ygtvcontent"><span id="ygtvlabelel2" class="ygtvlabel"><div class="treeAdm">	<div class="treeAdmTitulo"><span id="J_99999" onclick="TreeSelection.CopiarMoverContenido(99999)">Mis Jerarquías</span></div></div></span></td></tr></tbody></table><div class="ygtvchildren" id="ygtvc2" style="display:none;"></div></div><div class="ygtvitem ygtv-item" id="ygtv3"><table id="ygtvtableel3" border="0" cellpadding="0" cellspacing="0" class="ygtvtable ygtvdepth1 ygtv-highlight0"><tbody><tr class="ygtvrow"><td class="ygtvcell ygtvblankdepthcell"><div class="ygtvspacer"></div></td><td id="ygtvt3" class="ygtvcell ygtvtn"><a href="https://campus.ort.edu.ar/secundaria/almagro/informatica/articulo/2121278/04-03-react-native-componentes-2#" class="ygtvspacer"><i class="material-icons add">add</i><i class="material-icons remove">remove</i><i class="material-icons loading">refresh</i></a></td><td id="ygtvcontentel3" class="ygtvcell noprincipal ygtvcontent"><span id="ygtvlabelel3" class="ygtvlabel"><div class="treeAdm">	<div class="treeAdmTitulo"><span id="J_99997" onclick="TreeSelection.CopiarMoverContenido(99997)">Mis Jerarquías Favoritas</span></div></div></span></td></tr></tbody></table><div class="ygtvchildren" id="ygtvc3" style="display:none;"></div></div><div class="ygtvitem ygtv-item" id="ygtv4"><table id="ygtvtableel4" border="0" cellpadding="0" cellspacing="0" class="ygtvtable ygtvdepth1 ygtv-highlight0"><tbody><tr class="ygtvrow"><td class="ygtvcell ygtvblankdepthcell"><div class="ygtvspacer"></div></td><td id="ygtvt4" class="ygtvcell ygtvtp"><a href="https://campus.ort.edu.ar/secundaria/almagro/informatica/articulo/2121278/04-03-react-native-componentes-2#" class="ygtvspacer"><i class="material-icons add">add</i><i class="material-icons remove">remove</i><i class="material-icons loading">refresh</i></a></td><td id="ygtvcontentel4" class="ygtvcell principal ygtvcontent"><span id="ygtvlabelel4" class="ygtvlabel"><div class="treeAdm">	<div class="treeAdmTitulo"><span id="J_53680" onclick="TreeSelection.CopiarMoverContenido(53680)">2024 -  NI5C</span></div></div></span></td></tr></tbody></table><div class="ygtvchildren" id="ygtvc4" style="display:none;"></div></div></div></div></div></div></div>
+					<script type="text/javascript">
+						TreeSelection.init('CopiarMoverCont', [{"IdJerarquia":99999,"Nombre":"Jerarqu\u00edas","Nivel":0,"IsPrincipal":false},{"IdJerarquia":99999,"Nombre":"Mis Jerarqu\u00edas","Nivel":1,"IsPrincipal":false},{"IdJerarquia":99997,"Nombre":"Mis Jerarqu\u00edas Favoritas","Nivel":1,"IsPrincipal":false,"isLeaf":true},{"IdJerarquia":53680,"Nombre":"2024 -  NI5C","Nivel":1,"UrlAcceso":"campus.ort.edu.ar\/secundaria\/almagro\/informatica\/2024-ni5c","Externo":"65701","IsPrincipal":true,"isLeaf":false}],'CopiarMoverContenido',{"nombreContenido":"04-03 - React Native - Componentes 2","copiarCont":"Articulos","idContCopia":"2121278"});
+						
+											</script>
+				</div>
+			</td>
+		</tr>
+	</tbody></table>
+
+	<div class="administrarPaginacion pagination"></div>
+
+	<div class="popupBoton" style="visibility:hidden;"></div>
+
+	<div class="btn right" onclick="closeVisualizationPopup()">Cerrar</div>
+</div></div>
+<div id="popupVisualizationLoad"></div>
+</div>
+<div class="contVistCont">
+	    
+					<!--echo '<img src="'/static/images/' . $dat['image'] . '"/>';-->
+            
+                <div class="banner col s12">
+    	          <div class="card">
+                                            <div class="card-action">
+                            <div class="">
+                            	<a href="https://campus.ort.edu.ar/" class="breadcrumb">ORT Argentina</a><a href="https://campus.ort.edu.ar/secundaria/almagro" class="breadcrumb">Almagro</a><a href="https://campus.ort.edu.ar/secundaria/almagro/informatica" class="breadcrumb">Informática</a><a href="https://campus.ort.edu.ar/secundaria/almagro/informatica/articulos/2066224/home/2024-articulos-react-native-5ic" class="breadcrumb">2024 Articulos - React Native 5IC</a>                            </div>
+                            
+                        </div>
+                                        <div class="card-action breadcrumbs row">
+                        <div class="tituloContenido valign-wrapper col s11"><h2>04-03 - React Native - Componentes 2</h2></div>
+                        <div class="col s1">
+	                       <a href="https://campus.ort.edu.ar/secundaria/almagro/informatica/articulo/2121278/04-03-react-native-componentes-2#" data-activates="menuAcciones" class="dropdown-button" onmouseout="goHideMenuOperation()" onmouseover="expandMenuOperation()"><i class="material-icons">more_vert</i></a><ul id="menuAcciones" class="dropdown-content">
+					   
+				      </ul><script>var menuOperationsJSON = [{"json":"[\"SERVICIO\",\"#0091ea\"]","type":"Label"},{"json":"[\"HomeServicio\"]","type":"Item"},{"json":"[\"ContenidoNuevoContenido\"]","type":"Item"},{"json":"[\"CONTENIDO\",\"#0091ea\"]","type":"Label"},{"json":"[\"EditarContenido\"]","type":"Item"},{"json":"[\"CopiarContenido\"]","type":"Item"},{"json":"[\"MoverContenido\"]","type":"Item"},{"json":"[\"AgregarFavoritos\"]","type":"Item"},{"json":"[\"EliminarContenido\"]","type":"Item"}]; var menuOperationsOptions = {"urlJerarquia":"campus.ort.edu.ar\/secundaria\/almagro\/informatica","id":"2121278","tipoContenido":"ARTIC"};</script>                        </div>
+                    </div>
+                  </div>
+                </div>
+        	
+            		
+
+	    
+
+</div>
+	<div class="contCuerpCont card">
+				       
+		<div class="cuadCopCont row">
+			  
+
+            <div class="col s12 m12 l12">
+            			 04-03 - React Native - Componentes 2            </div>
+		</div>
+			<div class="row">
+		<div class="cuadTxtCont">
+			<iframe src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/embed.html" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>		</div>
+</div>
+
+		<div class="contenidoFooterPage">
+    <div class="cuadTagCont">
+    	
+		<span class="labTagVistCont">
+			Fecha:
+		</span>28/6/2024 | 
+		<span class="labTagVistCont">
+			Creado por:
+		</span>
+			<span class="capitalize">Pablo Ariel Ulman</span>    </div>
+    
+        
+</div>
+					</div>
+</div>
+    <!-- si hay un pdf, se llama a este script api adobe-->
+
+
+
+    <script src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/viewer(1).js.descarga"></script>
+    <!-- viewer.js -->
+    <script type="text/javascript">
+           document.addEventListener("adobe_dc_view_sdk.ready", function(){
+
+               var divsAdobe = document.querySelectorAll('*[id^="adobe_pdf_"]');
+
+               divsAdobe.forEach(function (element) {
+                   var divAseleccionar = element.getAttribute('id');
+
+                   var divAdobe    = document.getElementById(divAseleccionar);
+                   var nombrePdf   = divAdobe.getAttribute('data-nombrearchivo');
+                   var ubicacionPdf = divAdobe.getAttribute('data-ubicacionarchivo');
+
+                
+                    var adobeDCView = new AdobeDC.View({clientId: "a1c8203595834a5c9ace026239a0d1fa", divId: divAseleccionar});
+                    adobeDCView.previewFile({
+                        content:{location: {url: ubicacionPdf}},
+                        metaData:{fileName: nombrePdf }
+                    }, {embedMode: "FULL_WINDOW", showAnnotationTools: false});
+                });
+
+            });
+
+    </script>
+                </div>
+        </div>
+    </div>
+    <!-- fin bodySitio -->
+    
+    <!-- Site footer -->
+            <footer class="footer page-footer" style="background-color: #001f42;">
+            <div class="container">
+                <div class="row">
+                    <div class="col s12 m6 l3">
+                        <img src="./04-03 - React Native - Componentes 2 - Informática - Campus Virtual ORT_files/logoORTFooter.png" alt="Logo ORT Argentina">
+                        <ul class="redes-sociales">
+                            <li>
+                                <a class="social-fb" href="https://www.facebook.com/ortargentina" target="_blank" title="Facebook ORT Argentina">Facebook ORT Argentina</a>
+                            </li>
+                            <li>
+                                <a class="social-tw" href="https://twitter.com/ORTArgentina" target="_blank" title="Twitter ORT Argentina">Twitter ORT Argentina</a>
+                            </li>
+                            <li>
+                                <a class="social-ig" href="https://www.instagram.com/ortargentina" target="_blank" title="Instagram ORT Argentina">Instagram ORT Argentina</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col s12 m6 l3">
+                        <ul>
+                            <li>
+                                <a href="https://campus.ort.edu.ar/primaria">
+                                    <h4>Escuela Primaria</h4></a>
+                            </li>
+                            <li>
+                                <a href="https://campus.ort.edu.ar/secundaria">
+                                    <h4>Escuela Secundaria</h4></a>
+                            </li>
+                            <li>
+                                <a href="https://campus.ort.edu.ar/terciario">
+                                    <h4>Carreras Terciarias</h4></a>
+                            </li>
+                            <li>
+                                <a href="https://campus.ort.edu.ar/alumni">
+                                    <h4>Alumni</h4></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col s12 m6 l3">
+                        <ul>
+
+                            <li>
+                                <a href="https://crea.ort.edu.ar/"><h4>CREA</h4></a>
+                            </li>
+                            <li>
+                                <a href="https://editorial.ort.edu.ar/"><h4>Editorial ORT</h4></a>
+                            </li>
+                            <li>
+                                <a href="https://www.ort.edu.ar/" target="_blank"><h4>Sitio Web</h4></a>
+                            </li>
+                            <!--<li>
+                                <a href="/contacto">
+                                    <h4>Contacto</h4></a>
+                            </li>-->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-copyright">
+                <div class="container">
+                    Copyright © 2024 ORT Argentina
+                </div>
+            </div>
+        </footer>
+            <script type="text/javascript">LoadBarNotification('', '');</script>
+        
+    
+
+<div class="hiddendiv common"></div><div class="drag-target" style="right: 0px; touch-action: pan-y; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></div><div style="position: absolute; height: 1px; width: 1px; top: -1000px; left: -1000px;"><span class="ygtvtm">&nbsp;</span><span class="ygtvtmh">&nbsp;</span><span class="ygtvtp">&nbsp;</span><span class="ygtvtph">&nbsp;</span><span class="ygtvln">&nbsp;</span><span class="ygtvlm">&nbsp;</span><span class="ygtvlmh">&nbsp;</span><span class="ygtvlp">&nbsp;</span><span class="ygtvlph">&nbsp;</span><span class="ygtvloading">&nbsp;</span></div></body></html>

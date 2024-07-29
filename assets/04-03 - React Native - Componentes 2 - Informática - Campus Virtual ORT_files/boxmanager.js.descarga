@@ -1,0 +1,1128 @@
+var BoxCallback = function(){
+	var idsCallbak1 = new Array();
+	var idsCallbak2 = new Array();
+
+	this.saveCallback = function( _id, arr ){
+		if(typeof( _id ) == 'object' && arr == 1){
+			idsCallbak1[_id.tId] = _id;
+		}
+
+		if(typeof( _id ) == 'object' && arr == 2){
+			idsCallbak2[_id.tId] = _id;
+		}
+	}
+
+	this.elCallaback = function( _id, arr){
+		if(typeof(_id) == 'object' && typeof(_id) != 'undefined' && arr == 1){
+	    	idsCallbak1.splice( _id.tId, 1);
+	    }
+
+	    if(typeof(_id) == 'object' && typeof(_id) != 'undefined' && arr == 2){
+	    	idsCallbak2.splice( _id.tId, 1);
+	    }
+	}
+
+	this.killCallback = function(){
+		var arr1;
+		var arr2;
+		for(arr1 in idsCallbak1){
+				if(idsCallbak1[arr1] != 'undefined' || idsCallbak1[arr1] != '') { YAHOO.util.Connect.abort( idsCallbak1[arr1] ); }
+		}
+		for(arr2 in idsCallbak2){
+			if( typeof(idsCallbak2[arr2]) != 'undefined' || idsCallbak2[arr2] != '') { YAHOO.util.Connect.abort(idsCallbak2[arr2]); }
+		}
+	}
+}
+// ----------------------------------------------- //
+var oCallback 	= new BoxCallback();
+var httppeticion = 0;
+var arrURLCampus;
+// ----------------------------------------------- //
+
+// ----- Funciones de Accion (llamadas Asincronicas a boxactions.php) ----- //
+function recordPositions()
+{
+	var fila,ul;
+	var callback = 	{success: null,failure: null }
+	for (var columna=1;columna<=3;columna++)
+	{
+		ul = document.getElementById("ul" + columna);
+
+		fila = 0;
+		for (var i=0;i<ul.childNodes.length;i++)
+		{
+			element = ul.childNodes[i].id;
+			if 	((element!=undefined) && (element.substr(0,3)=='box'))
+			{
+				fila++;
+				element = element.replace('box_','');
+
+				sUrl = '/miescritorio/boxactions/';
+				postVar = 'method=RecordPosition&idCaja=' + element + '&fila=' + fila + '&columna=' + columna;
+				YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postVar);
+			}
+		}
+	}
+}
+
+function AddTab(titulo)
+{
+	var callback = 	{ success: ok, failure: null }
+	var sUrl = '/miescritorio/boxactions/';
+	var postVar = 'method=AddTab&titulo=' + titulo;
+	YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postVar);
+	function ok(obj)
+	{
+		form  = '<form id="formNewSolapa" action="/miescritorio/" method="POST">';
+		form += '<input type="hidden" name="solapaActual" id="solapaActual" value="' + obj.responseText + '"/>';
+		form += '</form>';
+		document.getElementById("writeCode").innerHTML = form;
+		document.getElementById("formNewSolapa").submit();
+	}
+}
+
+function EditTab(idSolapa)
+{
+	solapaName = document.getElementById('solapa_' + idSolapa).innerHTML;
+	solapaHTML  = '<input class="editSolapa" ';
+	solapaHTML += 'onBlur="doEditTab(event,\'' +  idSolapa + '\')" type="text" ';
+	solapaHTML += 'onKeyDown="doEditTab(event,\'' +  idSolapa + '\')" type="text" ';
+	solapaHTML += 'maxlength="25" ';
+	solapaHTML += 'id="inputSolapa_' + idSolapa + '" value="' + solapaName + '">';
+	document.getElementById('solapa_' + idSolapa).innerHTML = solapaHTML;
+	document.getElementById('inputSolapa_' + idSolapa).focus();
+	document.getElementById('solapa_' + idSolapa).onclick = function(){ }
+}
+
+function doEditTab(evt,idSolapa)
+{
+	var callback = 	{ success: ok, failure: null }
+	if (((evt.type)!='blur') && (evt.keyCode != 13)){ return 0;	}
+
+	var solapaId = document.getElementById('inputSolapa_' + idSolapa);
+	if(solapaId){
+		var solapaName = solapaId.value;
+		var divNombreSolapa = document.getElementById('nombreSolapa');
+		divNombreSolapa.innerHTML = solapaName;
+		var sUrl = '/miescritorio/boxactions/';
+		var postVar = 'method=EditTab&idSolapa=' + idSolapa + '&nombre=' + solapaName;
+
+		YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postVar);
+
+		document.getElementById('solapa_' + idSolapa).onclick = function() { EditTab(idSolapa); }
+	}
+	function ok(obj) { document.getElementById('solapa_' + idSolapa).innerHTML = obj.responseText; }
+}
+
+function DeleteTab(idSolapa)
+{
+	var callback = { success: ok, failure: null }
+	var sUrl = '/miescritorio/boxactions/';
+	var postVar = 'method=DeleteTab&idSolapa=' + idSolapa;
+
+	YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postVar);
+
+	function ok(obj)
+	{
+		form  = '<form id="formDeleteSolapa" action="/miescritorio/" method="POST">';
+		form += '<input type="hidden" name="solapaActual" id="solapaActual" value="0"/>';
+		form += '</form>';
+		document.getElementById("writeCode").innerHTML = form;
+		document.getElementById("formDeleteSolapa").submit();
+	}
+}
+
+function MoveToTab(idSolapa)
+{
+	if(document.getElementById("writeCode"))	box = document.getElementById("writeCode").innerHTML;
+	if 	(box.indexOf('box_')!=-1){
+
+		var idBox = box.replace('box_','');
+		document.getElementById(box).style.display = 'none';
+
+		var callback =	{ success: null, failure: null }
+		var sUrl = '/miescritorio/boxactions/';
+		var postVar = 'method=MoveToTab&idSolapa=' + idSolapa + '&idBox=' + idBox;
+
+		YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postVar);
+	}
+}
+
+function CloseBox(idCaja)
+{
+	var callback = 	{ success: ok, failure: null }
+	var sUrl = '/miescritorio/boxactions/';
+	var postVar = 'method=CloseBox&idCaja=' + idCaja;
+
+	YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postVar);
+
+	function ok(obj)
+	{
+		var	div = document.getElementById("box_" + idCaja);
+		div.style.display = 'none';
+		div.innerHTML = '';
+	}
+}
+
+function changeviews(idSolapa, idBox)
+{
+    var divBoxContent = document.getElementById('Box_Body_' + idBox);
+    var box = document.getElementById('cant_' + idBox);
+    var title_feed = document.getElementById('title_feed_' + idBox);
+    var url_feed = document.getElementById('url_feed_' + idBox);
+    //var errBox = document.getElementById('_errorBox');
+
+	var views = box.value;
+ 	var callback = 	{ success: ok, failure: null }
+	var sUrl = '/miescritorio/boxactions/';
+	var postVar = 'method=ChangeViews&idBox=' + idBox + '&cantItemsMuestra=' + views + '&TitleFeed=' + title_feed.value + '&UrlFeed=' + encodeURIComponent(url_feed.value);
+
+	YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postVar);
+
+	function ok(obj)
+	{
+	    if(obj.responseText=='ok')
+	       refreshCaja(idSolapa, idBox);
+	    else
+	       divBoxContent.innerHTML = '<div class="contenidoCaja" style="background-color:#FFF;"><div class="contieneTextoCaja"><div id="_errorBox" class="errorBox"><p>'+obj.responseText+'</p></div></div></div>';
+	}
+}
+
+function MaxOrMinBox(idCaja)
+{
+	var callback = { success: ok, failure: null	}
+	var sUrl = '/miescritorio/boxactions/';
+	var postVar = 'method=MaxOrMinBox&idCaja=' + idCaja;
+
+	YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postVar);
+
+	function ok(obj)
+	{
+		div = document.getElementById('Box_Body_' + idCaja);
+		div.style.display = (obj.responseText==1) ? 'block' : 'none';
+	}
+}
+
+function viewLink(url, idCaja, div)
+{
+	var callback = { success: ok, failure: null	}
+	if(div) div.className = 'titleFeed titleFeedLeido';
+	var sUrl = '/miescritorio/boxactions/';
+	var postVar = 'method=ViewLink&idCaja=' + idCaja + '&url=' + encodeURIComponent(url);
+
+	YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postVar);
+
+	function ok(obj)
+	{
+		divNoLeidos = document.getElementById('Box_' + idCaja + '_No_Leidos');
+		divNoLeidos.innerHTML = divNoLeidos.innerHTML - obj.responseText;
+	}
+	window.open(url,'_self');
+}
+
+function viewPost(divItem)
+{
+    if (typeof divPosts == 'undefined')
+	{
+        divPosts = createPopupDiv({width: 780, height: 180, alphaOpacity: 80, alphaColor: '#555', scroll:'no'});
+        divPosts.setAttribute('id', 'posts_' + divItem);
+
+        divClose = document.createElement('div');
+        divClose.className='closePosts';
+
+        imgclose = '<img src="/static/images/cerrar_zonapersonal.gif" border="0" onclick="javascript: closePopUpDivPost(\''+ divPosts.id +'\');" />';
+        divClose.innerHTML = imgclose;
+
+        posts =  document.getElementById('item' + divItem);
+        posts.className = 'contentPosts';
+        title =  document.getElementById('title' + divItem);
+        titlepost = document.createElement("div");
+        titlepost.className = "titlePosts";
+        titlepost.innerHTML = title.childNodes[0].nodeValue;
+
+        divContent = document.createElement('div');
+        divContent.appendChild(divClose);
+        divContent.appendChild(titlepost);
+        divContent.appendChild(posts);
+
+        divPosts.appendChild(divContent);
+	}
+}
+
+function closePopUpDivPost(id)
+{
+    queDiv = document.getElementById('posts_' + id);
+    closePopUpDiv(queDiv, 'yes');
+    MarcarLeidosenCaja();
+}
+
+function viewPostRss(id, url, guid, div)
+{
+	var idCaja = parseInt(id);
+    this._idCajaWidget = idCaja;
+    this._urlWidget = url;
+    this._divWidget = div;
+    this._GuidWidget = guid;
+
+    var callback = { success: ok, failure: FailBox }
+    if(idCaja){
+    	var sUrl = '/feedhtml/visualizar/'+idCaja;
+    	var postVar = 'idCaja=' + idCaja;
+    	var cObj = YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postVar);
+    }
+
+    function ok(obj){
+    	try{
+    		ShowDivPosts(obj.responseText, idCaja, guid);
+    	} catch (e) {
+            alert( e );
+        }
+    }
+
+    function FailBox(obj, cObj)
+	{
+		alert(obj.statusText);
+		YAHOO.util.Connect.abort(cObj);
+	}
+}
+
+function ShowDivPosts(listposts, idCaja, guid)
+{
+    var objBody = document.getElementsByTagName("body").item(0);
+    if(idCaja)
+	{
+        divAllPosts = createPopupDiv({width: 770, height: 515, alphaOpacity: 80, alphaColor: '#555', scroll:'yes', wtype: 'rss'});
+        divAllPosts.setAttribute('id', 'posts_' + idCaja);
+
+        divContent = document.createElement('div');
+        divContent.innerHTML = listposts;
+        divAllPosts.appendChild(divContent);
+
+        chkleidos();
+        rollrss(guid, 'reader');
+    }
+}
+
+function refreshXslt()
+{
+	var divAllPosts = document.getElementById('posts_'+_idCajaWidget);
+	divAllPosts.innerHTML = '';
+
+    var callback = { success: ok, failure: null }
+    var sUrl = '/feedhtml/actualizar/'+_idCajaWidget;
+	var postVar = 'idCaja=' + _idCajaWidget;
+    YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postVar);
+
+    function ok(obj)
+    {
+		restorss = 0;
+    	ShowDivReload(_idCajaWidget, _urlWidget, _GuidWidget, _divWidget);
+    }
+}
+
+function ShowDivReload(id, url, guid, div)
+{
+	this._idCajaWidget = id;
+    this._urlWidget = url;
+    this._divWidget = div;
+    this._GuidWidget = guid;
+
+    var callback = { success: ok, failure: null }
+    if(id)
+    {
+    	var sUrl = '/feedhtml/visualizar/'+id;
+    	var postVar = id;
+    	YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postVar);
+    }
+
+    function ok(obj)
+    {
+		var divAllPosts = document.getElementById('posts_'+id);
+		divContent = document.createElement('div');
+	    divContent.innerHTML = obj.responseText;
+	    divAllPosts.appendChild(divContent);
+	    chkleidos();
+	    rollrss(guid, 'reader');
+     }
+}
+
+function marcarLeidos(url, idCaja, div)
+{
+	var callback = { success: ok, failure: null	}
+	if(div) div.className = 'titleFeed titleFeedLeido';
+	var sUrl = '/miescritorio/boxactions/';
+	var postVar = 'method=ViewLink&idCaja=' + idCaja + '&url=' + encodeURIComponent(url);
+
+	YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postVar);
+
+	function ok(obj)
+	{
+		divNoLeidos = document.getElementById('Box_' + idCaja + '_No_Leidos');
+		var ld = divNoLeidos.innerHTML.replace('(','').replace(')','') - obj.responseText;
+		divNoLeidos.innerHTML = '('+ld+')';
+	}
+}
+
+function SetHiddenAndAddBox(_url, name)
+{
+	title = document.getElementById('_titleRss');
+	title.value = name;
+	AddBox(_url);
+}
+
+function AddBox(_url)
+{
+	debugger;
+	var _title = document.getElementById('_titleRss').value;
+    if(typeof _url == 'undefined') var _url = document.getElementById('input_url').value;
+	var oFeed = { url: _url, title: encodeURIComponent(_title) };
+	var objFeed = YAHOO.lang.JSON.stringify(oFeed);
+	var callback = { success: view, failure: null }
+	var myJSONObject = 'oFeed='+escape(objFeed);
+	sUrl = '/wsaddboxrss/autoAddbox';
+	YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, myJSONObject);
+
+	function view(obj)
+	{
+		window.location = '/miescritorio/';
+	}
+}
+
+function AddBoxAndTitle(_url, _title)
+{
+	var oFeed = { url: _url, title: encodeURIComponent(_title) };
+	var objFeed = YAHOO.lang.JSON.stringify(oFeed);
+	var callback = { success: view, failure: null }
+	var myJSONObject = 'oFeed='+escape(objFeed);
+	sUrl = '/wsaddboxrss/autoAddbox';
+	YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, myJSONObject);
+
+	function view(obj)
+	{
+		window.location = '/miescritorio/';
+	}
+
+}
+
+function AddMiEscritorioRss(obj)
+{
+	SelectSolapa(obj);
+}
+
+function AddMiEscritorioRssMultCajas(obj)
+{
+	SelectSolapaMultCajas(obj);
+}
+
+function SelectSolapa(obj)
+{
+	var callback =
+	{
+		success: function(o)
+		{
+			document.getElementById(idElmMgrTab).innerHTML = o.responseText;
+		},
+
+		failure: function(o)
+		{
+			return false;
+		}
+	}
+	data = 'title=' + obj.title + '&obj=' + escape(YAHOO.lang.JSON.stringify(obj));
+	YAHOO.util.Connect.asyncRequest('POST', '/static/miescritoriowizard/selectsolapa.php', callback, data);
+}
+
+function SelectSolapaMultCajas(obj)
+{
+	var callback =
+	{
+		success: function(o)
+		{
+			document.getElementById(idElmMgrTab).innerHTML = o.responseText;
+		},
+
+		failure: function(o)
+		{
+			return false;
+		}
+	}
+	data = 'obj=' + escape(YAHOO.lang.JSON.stringify(obj));
+	YAHOO.util.Connect.asyncRequest('POST', '/static/miescritoriowizard/selectsolapamult.php', callback, data);
+}
+
+function isNumeric(val)
+{
+    if((parseFloat(val)))
+    {
+    	return false;
+    }
+    return true;
+}
+
+function SaveBoxRss(data)
+{
+	if (getTabMgrItce())
+    {
+		$.ajax(
+        {
+            url: '/static/miescritoriowizard/saveRssBox.php',
+            data: {oFeed: data},
+            type: 'POST',
+            timeout: MgrCfg.maxTimeRequest,
+			dataType: 'json',
+			success: function(box)
+			{
+       			mgr.addBoxOnTab(box);
+       			if(box.tabTitle)
+       			{
+					mgr.loadNewTab(box.tabTitle, box.idTab, box.tabOrder);
+     		  	}
+            }
+		});
+    }
+	return false;
+}
+
+function SaveBoxRssMult(data)
+{
+	if (getTabMgrItce())
+    {
+		$.ajax(
+        {
+            url: '/static/miescritoriowizard/saveRssBoxMult.php',
+            data: 'oFeed=' + YAHOO.lang.JSON.stringify(data),
+            type: 'POST',
+            timeout: MgrCfg.maxTimeRequest,
+            complete: function(o, p)
+            {
+       			var box = YAHOO.lang.JSON.parse(o.responseText);
+       			for(var i = 0; i < box.feeds.length; i++)
+       			{
+       				mgr.addBoxOnTab(box.feeds[i]);
+       			}
+
+       			if(box.tabTitle)
+       			{
+					mgr.loadNewTab(box.tabTitle, box.idTab, box.tabOrder);
+       			}
+            }
+	    });
+    }
+	return false;
+}
+
+function SaveBoxNotes(data)
+{
+	if(data.solapa)
+	{
+		var param = 'denominacion=' + data.title + '&solapa=' + data.solapa;
+	}
+	else
+	{
+		var param = 'denominacion=' + data.title + '&solapaText=' + data.solapaText;
+	}
+
+	if (getTabMgrItce())
+    {
+		$.ajax(
+        {
+            url: '/static/miescritoriowizard/notes2.php',
+            data: param,
+            type: 'POST',
+            timeout: MgrCfg.maxTimeRequest,
+            //context: mgr,
+            complete: function(o, p)
+            {
+        		if (o.responseText.length > 0)
+                {
+        			var box = YAHOO.lang.JSON.parse(o.responseText);
+	                mgr.addBoxOnTab(box);
+	                if(box.tabTitle)
+	       			{
+						mgr.loadNewTab(box.tabTitle, box.idTab, box.tabOrder);
+	       			}
+                }
+            }
+	    });
+    }
+}
+
+function SaveBoxTasks(data)
+{
+	if(data.solapa)
+	{
+		var param = 'denominacion=' + data.title + '&solapa=' + data.solapa;
+	}
+	else
+	{
+		var param = 'denominacion=' + data.title + '&solapaText=' + data.solapaText;
+	}
+
+	if (getTabMgrItce())
+    {
+		$.ajax(
+        {
+            url: '/static/miescritoriowizard/task.php',
+            data: param,
+            type: 'POST',
+            timeout: MgrCfg.maxTimeRequest,
+            //context: mgr,
+            complete: function(o, p)
+            {
+        		if (o.responseText.length > 0)
+                {
+        			var box = YAHOO.lang.JSON.parse(o.responseText);
+        			mgr.addBoxOnTab(box);
+        			if(box.tabTitle)
+	       			{
+						mgr.loadNewTab(box.tabTitle, box.idTab, box.tabOrder);
+	       			}
+                }
+            }
+	    });
+    }
+	return false;
+	//
+
+	var callback =
+	{
+		success: function(o)
+		{
+			obj = eval('(' + o.responseText + ')');
+			if(data.solapaText)
+			{
+				document.getElementById('contCajaGlob').innerHTML = obj.html;
+			}
+			showSolapa(obj.id)
+		},
+
+		failure: function(o)
+		{
+			return false;
+		}
+	}
+	callback.data = data;
+
+	if(data.solapa)
+	{
+		var param = 'denominacion=' + data.title + '&solapa=' + data.solapa;
+	}
+	else
+	{
+		var param = 'denominacion=' + data.title + '&solapaText=' + data.solapaText;
+	}
+	sUrl = '/static/miescritoriowizard/task.php';
+	YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, param);
+}
+
+function AddBoxInterno(oFeed, idSolapa)
+{
+	if(typeof frm == 'undefined') { frm = null; }
+	if(typeof idSolapa == 'undefined') { var idSolapa = document.getElementById('_solapa').value; }
+
+	if(typeof(oFeed) == 'object')
+	{
+		var objFeed = YAHOO.lang.JSON.stringify(oFeed);
+
+		var divBoxMessage = (frm == 'formWidgetRssSingle') ? document.getElementById('feedControlSingle') : document.getElementById('feedControl');
+		var callback = { success: view, failure: null }
+	    var myJSONObject = 'idSolapa='+ idSolapa +'&oFeed='+escape(objFeed);
+		var divCajaFeed = document.getElementById('cajasfeed');
+
+	    showLoading(divBoxMessage);
+
+	    if(typeof idSolapa != 'undefined')
+	    {
+	    	sUrl = '/wsaddboxrss/addbox';
+	    	YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, myJSONObject);
+	    }
+	}
+
+	function view(obj)
+	{
+	    var str = obj.responseText;
+	    var idBox = str.split('"').join('');
+    	if(IsNumeric(idBox))
+    	{
+    	   	hiddenLoading(idBox);
+			ResfreshAddBoxInterno( parseInt(idSolapa),parseInt(idBox) );
+    	}
+    	else
+    	{
+    	    if(divBoxMessage)
+    	    {
+        	    divBoxMessage.innerHTML = '';
+        	    var Message = document.createElement('p');
+        	    var textMessage = document.createTextNode(idBox);
+        	    Message.appendChild(textMessage);
+        	    divBoxMessage.appendChild(Message);
+    	    }
+    	    return false;
+    	}
+	}
+}
+
+function fcnLoadArrayCajas(nueva)
+{
+	var arr = null;
+    var cant = document.getElementById('arrayCajas');
+	if(cant.value){
+	    if(nueva != null) {
+	        if(cant.value)
+	        	cant.value = cant.value + ',' + nueva;
+	        else
+	        	cant.value = nueva;
+	    }
+	    var arr = (cant.length == 1) ? cant.value : cant.value.split(',');
+	}
+    return arr;
+}
+
+function doit(method, idSolapa, nueva)
+{
+	var idCaja;
+    var divCajaWidget = document.getElementById('cajasfeed');
+	var objMenuInternoSolapa = document.getElementById('perswidget');
+
+    if(typeof nueva == 'undefined') { var nueva = null; }
+
+    if(typeof(divCajaWidget) != 'object')
+    {
+        window.document.location.href = '/miescritorio/add#box';
+    } else {
+        divCajaWidget.innerHTML ='';
+    }
+
+	if(nueva) { doitMenuInternoSolapa(objMenuInternoSolapa); }
+	arrURLCampus = fcnLoadArrayCajas(nueva);
+
+	IsMoveToTab(idSolapa);
+	new createUlList(divCajaWidget);
+
+	rss_doit(idSolapa, arrURLCampus);
+}
+
+// box individuales
+function rss_doit(idSolapa, arr)
+{
+	var idCaja;
+	if( typeof(arr) == 'object' ){
+		for(idCaja in arr)
+		{
+			var id = parseInt( arr[idCaja] );
+			if( !isNaN(id) ){
+				getHeadersCajas( parseInt(idSolapa), id );
+			}
+		}
+
+		setTimeout(function(){
+			if(arr){
+				var idCaja = parseInt( arr[0] );
+				if( !isNaN(idCaja) ){
+					getCaja( parseInt(idSolapa), idCaja );
+				}
+			}
+		},1000);
+	}
+}
+
+var arrBox = new Array();
+function getHeadersCajas(idSolapa, idCaja)
+{
+	var divCajaWidget 	= YAHOO.util.Dom.get('cajasfeed');
+ 	var callback = 	{ success:ok, failure:FailBox, scope: this }
+
+	if(typeof(idCaja) == 'number' && !isNaN(idCaja))
+	{
+		var box 			= new BoxWidget(idSolapa, idCaja);
+		box.ShowLoading();
+		var sUrl = '/miescritorio/boxactions/';
+		var postVar = 'method=getHeaderCaja&idSolapa=' + idSolapa + '&idCaja=' + idCaja;
+		var cObj = YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postVar);
+		oCallback.saveCallback( cObj, 1 );
+	}
+
+	function ok(obj, cObj)
+	{
+		if(  YAHOO.lang.JSON.isValid(obj.responseText) ){
+			try {
+                var oFeedInternet = YAHOO.lang.JSON.parse(obj.responseText);
+		    	box.initFeedItems(oFeedInternet);
+		    	box.getHeaderBox();
+    			oCallback.elCallaback( cObj, 1 );
+            } catch (e) {
+               	/*alert( idCaja + ' header ' + e);*/
+            }
+        } else {
+            /*alert("Invalid JSON"); */
+        }
+	}
+
+	function FailBox(obj, cObj)
+	{
+		YAHOO.util.Connect.abort(cObj);
+	}
+}
+
+var renovar = true;
+
+function getCaja(idSolapa, id, noRecursive)
+{
+	var idCaja 			= parseInt( id );
+	var divCajaWidget 	= YAHOO.util.Dom.get('cajasfeed');
+	var box 			= new LoadBoxWidget(idSolapa, idCaja);
+	box.clearItems();
+	box.ShowLoading();
+
+ 	var callback = 	{ success: ok, failure: FailBox, timeout: 3000 }
+	if(typeof(idCaja) == 'number' && !isNaN(idCaja)) {
+		var sUrl = '/miescritorio/boxactions/';
+		var postVar = 'method=getCaja&idSolapa=' + idSolapa + '&idCaja=' + idCaja;
+		var cObj = YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postVar);
+		oCallback.saveCallback( cObj, 2);
+	}
+
+	function ok(obj, cObj)
+	{
+		if(  YAHOO.lang.JSON.isValid( obj.responseText ) ){
+			try{
+		    	var oFeedInternet = YAHOO.lang.JSON.parse(obj.responseText);
+		    	box.HideLoading();
+			    box.initFeedItems(oFeedInternet);
+			    box.refreshDiv();
+			    if (!noRecursive){
+				    httppeticion = httppeticion + 1;
+					var _id = parseInt( arrURLCampus[httppeticion] );
+					getCaja(idSolapa, _id);
+			    }
+			    oCallback.elCallaback( cObj, 2);
+		    } catch (e) {
+                /*alert( idCaja + ' getcaja ' + e);*/
+                //FailBox(obj, cObj);
+            }
+		} else {
+            /*alert("Invalid JSON");*/
+        }
+	}
+
+	function FailBox(obj, cObj)
+	{
+		box.HideLoading();
+		box.MessageErrorDiv( false, obj );
+
+		YAHOO.util.Connect.abort(cObj);
+		if (!noRecursive){
+			httppeticion = httppeticion + 1;
+			var _id = parseInt( arrURLCampus[httppeticion] );
+			getCaja(idSolapa, _id);
+		}
+	}
+}
+
+function refreshCaja(idSolapa, idCaja)
+{
+	var divCajaWidget = document.getElementById('cajasfeed');
+	var box = new LoadBoxWidget(idSolapa, idCaja);
+	box.clearItems();
+	box.ShowLoading();
+
+ 	var callback = 	{ success: ok, failure: FailBox, cache:false }
+	var sUrl = '/miescritorio/boxactions/';
+	var postVar = 'method=RefreshCaja&idSolapa=' + idSolapa + '&idCaja=' + idCaja;
+
+	YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postVar);
+	function ok(obj)
+	{
+		if(  YAHOO.lang.JSON.isValid( obj.responseText ) ){
+			try{
+		    	var oFeedInternet = YAHOO.lang.JSON.parse( obj.responseText );
+		    	box.initFeedItems(oFeedInternet);
+		    	box.HideLoading();
+			    box.refreshDiv();
+			} catch (e) {
+                /*alert( idCaja + ' ' + e);*/
+            }
+		} else {
+            /*alert("Invalid JSON");*/
+        }
+	}
+
+	function FailBox(obj)
+	{
+		box.HideLoading();
+		box.MessageErrorDiv( false, obj );
+		YAHOO.util.Connect.abort(obj, callback);
+	}
+}
+
+function ResfreshAddBoxInterno(idSolapa, idCaja)
+{
+	var WidgetPath = location.pathname;
+
+	if (!WidgetPath.match(/\/miescritorio\/(.*?)/)) {
+		window.location = '/miescritorio/';
+	}
+
+	var objMenuInternoSolapa = document.getElementById('perswidget');
+	var box = new BoxWidget(idSolapa, idCaja);
+
+	if(objMenuInternoSolapa) doitMenuInternoSolapa(objMenuInternoSolapa);
+	var callback = { success: ok, failure: FailBox }
+	if(typeof idCaja == 'string' || typeof idCaja == 'number')
+	{
+		var sUrl = '/miescritorio/boxactions/';
+		var postVar = 'method=getCaja&idSolapa=' + idSolapa + '&idCaja=' + idCaja;
+		var cObj = YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postVar);
+	}
+
+	function ok(obj)
+	{
+		if(  YAHOO.lang.JSON.isValid(obj.responseText) ){
+			try{
+		    	var oFeedInternet = YAHOO.lang.JSON.parse(obj.responseText);
+			    box.initFeedItems(oFeedInternet);
+			    box.addBoxWidget();
+			}catch(e){
+				/*alert( idCaja + ' ' + e); */
+			}
+		} else {
+			/*alert("Invalid JSON");*/
+		}
+	}
+
+	function FailBox(obj, cObj)
+	{
+		box.HideLoading();
+		box.MessageErrorDiv( false, obj );
+		YAHOO.util.Connect.abort(cObj);
+	}
+}
+
+function showLoading(divBox)
+{
+    if(!divBox) var divBox = document.getElementById('feedControl');
+    else
+    {
+        divLoading = document.getElementById('_loadingBox');
+        if(!divLoading)
+        {
+            divBox.innerHTML = '';
+            divLoading = document.createElement('div');
+            divLoading.setAttribute('id', '_loadingBox');
+            divLoading.setAttribute('style', 'margin:0 auto;width:230px;padding-top:20px;');
+            divLoading.innerHTML = '<br/><img src="/static/images/loader.gif" border="0" alt="" class="loader_widget" />';
+            divBox.appendChild(divLoading);
+        }
+    }
+}
+
+function hiddenLoading()
+{
+	var divBox = (frm == 'formWidgetRssSingle') ? document.getElementById('feedControlSingle') : document.getElementById('feedControl');
+
+	var divLoading = document.getElementById('_loadingBox');
+	if(divBox)
+			divBox.removeChild(divLoading);
+}
+
+function AbortAjax()
+{
+	var arr1;
+	var arr2;
+
+	var links = YAHOO.util.Dom.get('body').getElementsByTagName('a'); //contCajaGlob
+	for (var i = 0, len = links.length; i < len; i++)
+	{
+		YAHOO.util.Event.addListener(links[i], 'click', function()
+		{
+			for(arr1 in idsCallbak1){
+				if(idsCallbak1[arr1] != 'undefined') { YAHOO.util.Connect.abort(idsCallbak1[arr1]); }
+			}
+			for(arr2 in idsCallbak2){
+				if( idsCallbak2[arr2] != 'undefined') { YAHOO.util.Connect.abort(idsCallbak2[arr2]); }
+			}
+		});
+
+	}
+}
+// ------------- Funciones Auxiliares ------------- //
+function hitPos(o,x,y){
+	for(
+		var r = {
+					l: o.offsetLeft,
+					t: o.offsetTop,
+					r: o.offsetWidth,
+					b: o.offsetHeight
+				};
+         o = o.offsetParent; r.l += o.offsetLeft, r.t += o.offsetTop);
+     r.r += r.l;
+     r.b += r.t;
+
+	return ((r.l <= x) && (r.r >= x) && (r.t <= y) && (r.b >= y));
+}
+
+function IsMoveToTab(solapas)
+{
+	solapas = solapas + '';
+	solapas = solapas.split(",");
+
+	if (solapas[0]!="undefined")
+	{
+		document.onmouseup = function (e)
+		{
+			x = (typeof(event)=='undefined') ? e.pageX : event.clientX;
+			y = (typeof(event)=='undefined') ? e.pageY : event.clientY;
+
+			for(i=0;i<solapas.length;i++)
+			{
+				solapa = document.getElementById("solapa_" + solapas[i]);
+
+				if (solapa != null)
+				{
+					if (hitPos(solapa,x,y)) MoveToTab(solapas[i]);
+				}
+			}
+
+			document.getElementById("writeCode").innerHTML = '';
+		}
+	}
+}
+// ------------- Custom Drag & Drop Implementation ------------- //
+var Dom = YAHOO.util.Dom;
+var Event = YAHOO.util.Event;
+var DDM = YAHOO.util.DragDropMgr;
+
+YAHOO.example.DDList = function(id, sGroup, config) {
+
+    YAHOO.example.DDList.superclass.constructor.call(this, id, sGroup, config);
+
+    this.logger = this.logger || YAHOO;
+    var el = this.getDragEl();
+    Dom.setStyle(el, "opacity", 0.58); // The proxy is slightly transparent
+
+    this.goingUp = false;
+    this.lastY = 0;
+};
+
+YAHOO.extend(YAHOO.example.DDList, YAHOO.util.DDProxy, {
+
+    startDrag: function(x, y) {
+        this.logger.log(this.id + " startDrag");
+        // make the proxy look like the source element
+        var dragEl = this.getDragEl();
+        var clickEl = this.getEl();
+        document.getElementById("writeCode").innerHTML = clickEl.id;
+        Dom.setStyle(clickEl, "visibility", "hidden");
+        dragEl.innerHTML = clickEl.innerHTML;
+        Dom.setStyle(dragEl, "color", Dom.getStyle(clickEl, "color"));
+        Dom.setStyle(dragEl, "backgroundColor", Dom.getStyle(clickEl, "backgroundColor"));
+        Dom.setStyle(dragEl, "border", "2px solid gray");
+    },
+
+    endDrag: function(e) {
+        var srcEl = this.getEl();
+        var proxy = this.getDragEl();
+        recordPositions();
+        // Show the proxy element and animate it to the src element's location
+        Dom.setStyle(proxy, "visibility", "");
+        var time = 0;
+        var a = new YAHOO.util.Motion(
+            proxy, {
+                points: {
+                    to: Dom.getXY(srcEl)
+                }
+            },
+            time,
+            YAHOO.util.Easing.easeOut
+        )
+        var proxyid = proxy.id;
+        var thisid = this.id;
+        // Hide the proxy and show the source element when finished with the animation
+        a.onComplete.subscribe(function() {
+                Dom.setStyle(proxyid, "visibility", "hidden");
+                Dom.setStyle(thisid, "visibility", "");
+            });
+        a.animate();
+        setTimeout("document.getElementById('ygddfdiv').innerHTML = '';",(time*1000 + 200))
+    },
+
+    onDragDrop: function(e, id) {
+    	// If there is one drop interaction, the li was dropped either on the list,
+        // or it was dropped on the current location of the source element.
+        var destDD = DDM.getDDById(id);
+        if (DDM.interactionInfo.drop.length === 1) {
+            // The position of the cursor at the time of the drop (YAHOO.util.Point)
+            var pt = DDM.interactionInfo.point;
+            // The region occupied by the source element at the time of the drop
+            var region = DDM.interactionInfo.sourceRegion;
+            // Check to see if we are over the source element's location.  We will
+            // append to the bottom of the list once we are sure it was a drop in
+            // the negative space (the area of the list without any list items)
+			if (!region.intersect(pt)) {
+                var destEl = Dom.get(id);
+                destEl.appendChild(this.getEl());
+                destDD.isEmpty = false;
+                DDM.refreshCache();
+            }
+        }
+    },
+
+    onDrag: function(e) {
+		document.getElementById('ygddfdiv').style.border= '0px';
+        // Keep track of the direction of the drag for use during onDragOver
+        var y = Event.getPageY(e);
+        if (y < this.lastY) {
+            this.goingUp = true;
+        } else if (y > this.lastY) {
+            this.goingUp = false;
+        }
+        this.lastY = y;
+    },
+
+    onDragOver: function(e, id) {
+        var srcEl = this.getEl();
+        var destEl = Dom.get(id);
+        // We are only concerned with list items, we ignore the dragover
+        // notifications for the list.
+        if (destEl.nodeName.toLowerCase() == "li") {
+            var orig_p = srcEl.parentNode;
+            var p = destEl.parentNode;
+            if (this.goingUp) {
+                p.insertBefore(srcEl, destEl); // insert above
+            } else {
+                p.insertBefore(srcEl, destEl.nextSibling); // insert below
+            }
+            DDM.refreshCache();
+        }
+    }
+});
+
+//YAHOO.util.Event.onDOMReady( function(){
+
+	var links = document.getElementsByTagName('a');
+	for (var i = 0, len = links.length; i < len; i++)
+	{
+		YAHOO.util.Event.addListener(links[i], 'click', function()
+		{
+			oCallback.killCallback();
+		});
+	}
+//});
+
+function AddBoxRssOnMiEscritorio(idServ, url, titulo)
+{
+	titulo = titulo || false;
+	var prm = 'method=CreateBoxFromIdService&i='+idServ+'&u='+url+'&titulo='+titulo;
+	YAHOO.util.Connect.asyncRequest
+	(
+		'POST',
+		'/miescritorio/boxactions/',
+		{
+			success: function()
+			{
+				window.location = '/miescritorio/';
+			},
+			failure: null
+		},
+		prm);
+}

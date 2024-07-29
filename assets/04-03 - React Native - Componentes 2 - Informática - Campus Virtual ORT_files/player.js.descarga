@@ -1,0 +1,181 @@
+/**
+ * Funciones Auxiliares del Player
+ */
+
+function video(id,width,height,color,autoplay)
+{
+	if(typeof(autoplay) == 'undefined') autoplay = false;
+	var numericId = 0;
+	
+	if(String(id).indexOf('_') == -1)
+	{
+		numericId = id;
+        var divId = id;
+		var videoId = 'video_'+id;
+
+        /*var node = document.getElementById(divId);
+        alert (node);
+        if (node.parentNode) {
+            node.parentNode.removeChild(node);
+        }*/
+        //preguntar si existe el tag que viene de video_conversion. Si existe, #.html. Si no, document.write
+        
+        if(document.getElementById(id)){
+            $('#'+id).html('<video id="'+videoId+'" class="video-js vjs-default-skin vjs-big-play-centered responsive-video" controls></video>');
+        }else{
+    		document.write('<div id="'+divId+'" class="videoContainer">');
+            document.write('<video id="'+videoId+'" class="video-js vjs-default-skin vjs-big-play-centered responsive-video" controls></video>');
+            document.write('</div>');
+        }
+
+	}
+	else
+	{
+		numericId = id.substring(id.indexOf('_') + 1);
+		videoId = id;
+		$('#'+videoId).html('');
+	}
+	
+	$.get('/static/video/file_exists.php', {'idContenido': numericId}, function(data)
+	{
+		if(data['error'])
+		{
+			if(data['url'])
+			{
+				$('#'+divId).html('<div class="conversion_placeholder"><div class="message">El archivo de video tiene un formato incompatible.<br />Por el momento no se aceptan archivos <i>'+data['url']+'</i>.</div></div>');
+				return;
+			}
+			else
+			{
+				$('#'+divId).html('<div class="conversion_placeholder"><div class="message">El archivo de video no existe.</div></div>');
+				return;
+			}
+			return;
+		}
+
+		var file = data['url'];
+        var extension = data['url'].slice(-3);
+        
+        if(extension == 'flv'){
+            $('#'+divId).html('<div class="conversion_placeholder"><div class="message">El archivo de video tiene un formato incompatible.<br />Por favor, comuníquese con el administrador.</div></div>');
+        }else{
+
+            var player;
+            $(document).ready(function() {
+            	player = videojs('video_'+id, {
+            		techOrder: ['html5', 'flash'],
+            		autoplay: false,
+                    fluid: true,
+                    poster: '/video/imagen/' + id,
+            		sources: [{ 
+            			type: "video/mp4",
+            			src: file
+            		}]
+            	}); 
+            });
+        }
+	},
+	'json');
+}
+
+var progressInterval;
+function video_conversion(id, width, height, color, autoplay)
+{
+	var numericId = 0;
+	if(String(id).indexOf('_') == -1)
+	{
+		numericId = id;
+		var videoId = 'video_'+id;
+		document.write('<div id="'+id+'"></div>');
+	}
+	else
+	{
+		numericId = id.substring(id.indexOf('_') + 1);
+		videoId = id;
+	}
+
+	$('#'+id).html('<div class="conversion_placeholder"><div class="message">Este video se está convirtiendo<br />a un formato válido para su reproducción.<div class="porcentaje"></div></div></div>');
+
+	progressInterval = setInterval(function()
+	{
+		$.get('/static/video/progress.php', {'idContenido': numericId}, function(data)
+		{
+			if(data['error'])
+			{
+				if(data['error'] == 'in_queue')
+					$('.porcentaje', '#'+videoId).html('EN COLA');
+				else if(data['error'] == 'invalid_information')
+				{
+				}
+				else
+				{
+					if(data['error'] == 'video_not_exists')
+						$('.message', '#'+id).html('Ocurrió un error.');
+					else
+						video(id, width, height, color, autoplay);
+
+					clearInterval(progressInterval);
+				}
+					return;
+			}
+
+			if(data['converted_time'] == data['total_time'])
+			{
+				//alert ('fin'); alert (id);
+                video(id, width, height, color, autoplay);
+				clearInterval(progressInterval);
+			}
+			else
+				$('.porcentaje', '#'+id).html(Math.round(data['converted_seconds'] * 100 / data['total_seconds']) + '%');
+		},
+		'json');
+	},
+	5000);
+}
+
+        /*jwplayer(videoId).setup({
+			autostart: autoplay,
+			modes: [
+				{type: 'html5'},
+				{type: 'flash', src: '/static/mediaplayer/player.swf'},
+				{type: 'download'}
+			],
+			file: file,
+			plugins: 'timeslidertooltipplugin-2,gapro-2',
+			image: '/video/imagen/' + id,
+			height: height,
+			width: width,
+			backcolor: color,
+			frontcolor: '0xCCCCCC',
+			lightcolor: '0xFFFFFF',
+			menu: false,
+			events: {
+				onReady: function(){ if(typeof(autoAdjustHomeInstitucionalBox) != 'undefined') autoAdjustHomeInstitucionalBox(); }
+			}
+		});*/
+        
+        /*videojs(videoId, {}, function(){
+            // Player (this) is initialized and ready.
+            'controls': true, 
+            'autoplay': false, 
+            'preload': 'auto' ,
+            'poster': '/video/imagen/' + id,
+            'src': file;
+            "techOrder": ["html5", "flash"]
+        });*/
+        
+       /* videojs(videoId).ready(function(){
+            
+           var myTech = Tech();           
+           var myPlayer = this;
+           myPlayer.src(file); 
+           myPlayer.poster('/video/imagen/' + id); 
+           myPlayer.fluid(true);
+           
+           //Falta incluir el TECH para que levante el swf.
+           //http://docs.videojs.com/docs/guides/tech.html
+           
+          
+           if(typeof(autoAdjustHomeInstitucionalBox) != 'undefined') autoAdjustHomeInstitucionalBox();            
+        });*/
+        

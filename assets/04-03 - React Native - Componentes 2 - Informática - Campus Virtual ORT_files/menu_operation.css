@@ -1,0 +1,79 @@
+/**** Menu Operations *****/
+
+#MenuOperations
+{
+	/*position: absolute;
+	width: 200px;
+	border: solid #C9C9C9 1px;
+	background-color: #fefefe;
+	padding: 1px;
+	display: none;
+	z-index: 500;*/
+}
+
+.MenuOperationsItem
+{
+	margin: 0;
+	padding: 0;
+}
+
+.MenuOperationsItem a img, .MenuOperationsItem span img
+{
+	/*margin-right: 5px;*/
+}
+
+.MenuOperationsItem a, .MenuOperationsItem span
+{
+	/*color: #686868;
+	cursor: pointer;
+	font-weight: normal;
+	display: block;
+	height: 200%;
+	padding: 5px;
+	padding-left: 8px;*/
+}
+.MenuOperationsLabel{
+    min-height: 25px !important;
+}
+.MenuOperationsLabel span
+{
+	/*width: 187px;
+	padding: 5px;
+	padding-left: 8px;*/
+	color: #fff;
+    min-height: 25px;
+}
+.MenuOperationsItem:hover{
+    background-color: #0091ea !important;/* light-blue accent-4*/
+}
+.MenuOperationsItem:hover a{
+    color: #FFFFFF !important;/* light-blue accent-4*/
+}
+.MenuOperationsItemSelected
+{
+	background-color: #04AFE3;
+}
+
+.MenuOperationsItemSelected a
+{
+	color: #fff;
+}
+
+.MenuOperationsItemSelected span
+{
+	color: #fff;
+}
+.contMenOpe
+{
+	position: absolute;
+	width: 200px;
+	border-top:0;
+	border-right:1px solid #c1c5c7;
+	border-bottom:1px solid #818385;
+	border-left:1px solid #818385;
+	background-color: #fefefe;
+	padding: 2px 1px 1px 1px;
+	display: none;
+	z-index:2;
+}
+/**** Fin Menu Operations *****/

@@ -1,0 +1,618 @@
+if(!String.prototype.trim){  
+  String.prototype.trim = function(){  
+    return this.replace(/^\s*|\s*$/g,'');  
+  };  
+}
+var DomGet = YAHOO.util.Dom.get;
+
+var Login =
+{
+	iniciar: function(oOpc)
+	{
+		Login.formulario = false;
+		Login.txtUsuario = false;
+		Login.txtContras = false;
+		Login.saveForm = false;
+		Login.urlReferer = '/';
+		Login.idContened = 'contCuadLogin';
+		Login.oOpc = typeof(oOpc) != 'undefined' ? oOpc : {};
+
+		// Seteo los valores a la clase, desde el objeto pasado como parametro
+		for(n in oOpc)
+		{
+			try{
+				eval('Login.'+n+' = '+(typeof(oOpc[n]) == 'string' ? '\''+oOpc[n]+'\'' : oOpc[n])+';');
+			}
+			catch(e){}
+		}
+	},
+
+	envDat: function(formul)
+	{
+		Login.formulario = formul;
+		Login.txtUsuario = formul.TxtNombreUsuario;
+		Login.txtContras = formul.TxtPassword;
+		Login.saveForm = formul.ChkSaveLogin ? formul.ChkSaveLogin.checked : false;
+		Login.sendForm();
+	},
+
+	envDatAutLog: function(formul)
+	{
+		Login.formulario = formul;
+		Login.txtUsuario = formul.TxtNombreUsuario;
+		Login.txtContras = formul.TxtPassword;
+		Login.saveForm = true;
+		Login.sendForm();
+	},
+	
+	sendForm: function()
+	{
+		Login.mostPopUpDiv();
+		Login.mostMsjCarga();
+		
+		var callback =
+		{
+			success: function(o)
+			{
+				if(o.responseText != '')
+				{
+				    
+					var res;
+					try
+					{
+						res = YAHOO.lang.JSON.parse(o.responseText);
+					}
+					catch(e)
+					{
+						res = false;
+					}
+					if(res)
+					{
+						if(typeof(Login.oOpc.callback) == 'function')
+						{
+							Login.oOpc.callback(res);
+						}
+						else
+						{
+							switch(res.tip)
+							{
+								case '5':
+									if(res.alu && !res.rta){ //muestra el mensaje de codigo de convivencia para la firma digital del alumno
+										Login.mostMsjNotificacion(res);
+									}
+                                    else
+                                    {
+                                       window.location = res.url; 
+                                    }
+									break;
+								case '4': // Aviso -> sin mail
+									Login.mostMsjErrPers(res.tit, res.url, res.but);
+									break;
+								case '3': // Sin jerarquía principal
+									Login.mostMsjNoJerPrincp();
+									break;
+								case '2': // Referrer
+									if(res.alu && !res.rta){ //muestra el mensaje de codigo de convivencia para la firma digital del alumno
+										Login.mostMsjNotificacion(res);
+									}
+                                    else
+                                    {
+                                       window.location = res.url; 
+                                    }
+									break;
+								case '1': // Múltiples jerarquías
+									Login.cargOpcSeleccion(res);
+									break;
+								default: // Usuario o contraseña inválido
+									Login.mostMsjUsuarioInv(res.cod);
+									break;
+							}
+                            
+                            if(res.alu && !res.rta) //muestra el mensaje de codigo de convivencia para la firma digital del alumno
+							    Login.mostMsjNotificacion(res);
+						}
+					}
+					else
+					{
+						finalizarCargando();
+						abrirDialogo('Error en la autenticación', 'error');
+					}
+				}
+			},
+
+			failure: function(o)
+			{
+				finalizarCargando();
+				abrirDialogo('Error en la autenticación', 'error');
+			}
+		}
+
+		var params = 'u=' + Login.txtUsuario.value + '&c=' + Login.txtContras.value + '&saveForm=' + Login.saveForm + '&r=' + (Login.urlReferer != '/' ? Login.urlReferer : '');
+		YAHOO.util.Connect.asyncRequest('POST', '/ajaxactions/LogearUsuario', callback, params);
+	},
+
+	mostPopUpDiv: function()
+	{
+		Login.limpBodyPopup();
+
+		DomGet(Login.idContened).style.display = 'block';
+
+		var dimVent = Login.dimensVentana();
+
+		var widtVent = '100';
+
+	    var leftVent = (dimVent[0] / 2) - (widtVent / 2);
+
+		if(!YAHOO.cuadContLogin)
+		{
+			YAHOO.namespace("cuadContLogin");
+
+			YAHOO.cuadContLogin = new YAHOO.widget.Panel(Login.idContened,
+			{
+                width: widtVent + '%',
+				visible: false,
+				fixedcenter: true,
+				draggable: false,
+				close: false,
+				modal: true
+			});
+
+			YAHOO.cuadContLogin.render();
+		}
+
+	},
+
+	grafCuadSelecJer: function(arrJer)
+	{
+		var html = '';
+		
+		html += '<form method="POST" onsubmit="javascript:Login.grabSelJer(this); return false;">';
+		html += '<div class="contSel">';
+		html += '<div class="titOpcSel">Jerarquia</div>';
+		html += '<div class="contCuadLisOpc">';
+		html += '<div class="notSelJer">Seleccione la Jerarquia con la que desee loguearse</div>';
+		html += '<div class="msjPopUps" id="contMsjErr"></div>';
+		var i;
+
+		for(i = 0; i < arrJer.opc.length; i++)
+		{
+			html += '<div class="linOpc" onclick="javascript:Login.ocultMsjErr();Login.enaBotEnvio();">';
+			html += '<input type="radio" id="opc_' + arrJer.opc[i].idJer + '" name="opcJer" value="' + arrJer.opc[i].idJer + '">';
+			html += '<label for="opc_' + arrJer.opc[i].idJer + '">' + arrJer.opc[i].nombre + '</label>';
+			html += '</div>';
+		}
+
+		html += '</div>';
+		html += '<input type="checkbox" id="saveDefault" name="saveDefault"><label for="saveDefault">Guardar como default</label>';
+		html += '</div>';
+		html += '<div class="btnPopUps"><input class="btn" id="botSbmSelJer" name="botSbmSelJer" type="submit" value="Aceptar"><input class="btn" type="button" value="Cancelar" onclick="javascript:Login.cerrCuadSelJer();" ></div>';
+		html += '</form>';
+
+		return html;
+	},
+
+	setCookie: function(name, value, exdays)
+	{
+		var exdate=new Date();
+		exdate.setDate(exdate.getDate() + exdays);
+		var c_value=escape(value) + ((exdays==null) ? "" : "; expires="+exdate.toUTCString());
+		document.cookie=name + "=" + c_value;
+	},
+	getCookie: function(name)
+	{
+		var i,x,y,ARRcookies=document.cookie.split(";");
+		for (i=0;i<ARRcookies.length;i++)
+		{
+			x=ARRcookies[i].substr(0,ARRcookies[i].indexOf("="));
+			y=ARRcookies[i].substr(ARRcookies[i].indexOf("=")+1);
+			x=x.replace(/^\s+|\s+$/g,"");
+			if (x==name)
+			{
+				return unescape(y);
+			}
+		}
+		return false;
+	},
+	
+	msjToHomeOrToURL: function(res)
+	{
+	
+		var html = '';
+
+		html += '<form method="POST" name="welcomeFrm" onsubmit="Login.grabOpcToHomeOrToURL(this); return false;">';
+		html += '<div class="contSel">';
+		html += '<div class="titOpcSel">Bienvenido</div>';
+		html += '<div class="contCuadLisOpc">';
+		html += '<div class="notSelJer">Seleccione qué acción desea realizar a continuación</div>';
+		html += '<div class="msjPopUps" id="contMsjErr"></div>';
+
+       
+        //Actualizacion para V2 MK 05/12/2016
+        html += '<div class="linOpc" onclick="Login.ocultMsjErr();Login.enaBotEnvio();">';
+		html += '<div class="floatLeft"><input type="radio" id="opc_home" name="opc" value="'+res.url+'"><label for="opc_home">Ir a la home personal</label></div>';
+		html += '</div>';
+        
+        html += '<div class="linOpc" onclick="Login.ocultMsjErr();Login.enaBotEnvio();">';
+		html += '<div class="floatLeft"><input type="radio" id="opc_url" name="opc" value="'+res.urlref+'"><label for="opc_url">Seguir en esta página</label></div>';
+		html += '</div>';
+	    //Fin actualización
+
+		html += '</div>';
+		html += '<input type="checkbox" id="saveDefault" name="saveDefault"><label for="saveDefault">Guardar como default</label>';
+		html += '<input type="hidden" id="homeUrl" name="homeUrl" value="'+res.url+'"/>';
+		html += '</div>';
+		html += '<div class="btnPopUps"><input class="btn" id="botSbmSelJer" name="botSbmSelJer" type="submit" value="Aceptar"></div>';
+		html += '</form>';
+
+		return html;
+	},
+	//Arma el mensaje del acuerdo de convivencia -- ACUERDOCONVIVENCIA
+	msjNotificacion: function(res)
+	{
+		var html = '';
+
+        html += '<form method="POST" name="welcomeFrm" onsubmit="Login.grabNotificacion('+res.user+');">';
+        html += '<h3>Código de Convivencia Escolar</h3>';
+        html += '<strong>Principios y Objetivos</strong>';
+        html += '<p>El Código de Convivencia de la Escuela ORT establece los principios, criterios, normas y prácticas institucionales para posibilitar el cumplimiento de la finalidad primordial de la escuela: brindar a todos/as los/as estudiantes las mejores oportunidades de aprendizaje académico, socio-afectivo y emocional, en un clima de trabajo y respeto entre todos los actores institucionales, valorando el proyecto educativo institucional.</p>';
+        html += '<p>El mismo se encuadra en el marco normativo del sistema de convivencia escolar, vigente en el ámbito de la jurisdicción de la Ciudad Autónoma de Buenos Aires, y toma como referencia la legislación actual en relación a los derechos de niños, niñas y adolescentes.</p>';
+        html += '<p>Son objetivos fundamentales para la convivencia escolar,  promover en la escuela  el respeto y la aceptación de las diferencias, la responsabilidad individual y el compromiso con los otros, la solidaridad, la cooperación, el respeto por la intimidad y la privacidad de las personas, el rechazo de todo tipo de discriminación, segregación, estigmatización o construcción de estereotipos y de aquellas prácticas que impliquen una agresión a la integridad física y moral de los/las estudiantes, docentes y todos los miembros de la comunidad educativa.</p>';
+        html += '<p>Este Código fomenta la función de la escuela como garante de la ampliación y ejercicio de derechos, favoreciendo acciones de promoción sobre temáticas transversales: Educación Sexual Integral, Prevención en relación al consumo, Cuidado de la Salud, Construcción de ciudadanía, Uso responsable de la tecnología, Construcción de la Identidad, entre otras.</p>';
+        html += '<p>El conjunto de valores que se referencian en este Código y que la escuela promueve, contribuyen al desarrollo integral y a la autonomía progresiva de los/las estudiantes, en una perspectiva de ejercicio de la libertad con responsabilidad.</p>';
+        html += '<strong>Valores rectores de la convivencia escolar</strong>';
+        html += '<ul style="list-style-type:disc;"><li>La defensa de la paz y la erradicación de la violencia.</li>';
+        html += '<li>El respeto y la valoración por la diversidad y la inclusión.</li>';
+        html += '<li>La responsabilidad ciudadana y el respeto a los derechos propios y de otras personas.</li>';
+        html += '<li>La Conciencia y la responsabilidad por el cuidado y promoción de la salud.</li>';
+        html += '<li>El Cuidado del medio ambiente.</li>';
+        html += '<li>El Respeto y el cuidado responsable de los recursos materiales y bienes.</li>';
+        html += '<li>El Respeto y la solidaridad entre todos los actores de la comunidad educativa.</li></ul>';
+        html += '<p>Los códigos, reglamentos y normas explícitas operan como marco regulatorio. Para que esto sea posible todos los actores requieren conocerlos en un proceso que implique su aprendizaje y apropiación. De este modo, se conforma el marco regulatorio de las relaciones y acciones que se dan dentro de la escuela, encuadrando la tarea y la vida escolar cotidiana. Es, en este sentido que, el marco normativo del sistema de convivencia escolar, establece las sanciones previstas para aquellas situaciones en las que alumnos/as se aparten de esta perspectiva afectando el clima institucional y la finalidad educativa de la escuela.</p>';       
+        html += '<strong>Mecanismos y Sanciones previstas</strong>';
+        html += '<p>La aplicación de las diversas sanciones se fundamenta en el análisis de la gravedad de las faltas cometidas, así como en una evaluación del trayecto previo del/a estudiante en la escuela. En todos los casos las sanciones tienen una finalidad educativa y apelan a la reflexión, la reparación del daño causado y la aceptación de las consecuencias.  A su vez, sostienen el objetivo de seguir trabajando, familia y escuela en forma conjunta para el cuidado del bien común y del clima de trabajo escolar.</p>';
+        html += '<p>Las sanciones alcanzan a las conductas o acciones contrarias a los principios y normas del Código de Convivencia Escolar, producidas en el establecimiento educativo o fuera de él durante las actividades programadas u organizadas por las autoridades o el cuerpo docente.</p>';
+        html += '<p>Para el caso de acciones o conductas vinculadas con la vida escolar, que se desarrollen fuera del establecimiento y afecten a miembros de la comunidad educativa, su consideración a efectos de la posible aplicación de sanciones es responsabilidad de las autoridades de la institución.</p>';
+        html += '<p>Ante una falta a la normativa escolar las sanciones previstas son:</p>';        
+        html += '<p>a.&nbsp;	Apercibimiento oral.</p>';
+        html += '<p>b.&nbsp;	Apercibimiento escrito.</p>';
+        html += '<p>c.&nbsp;	Realización de acciones reparatorias en beneficio de la comunidad escolar.</p>';
+        html += '<p>d.&nbsp;	Cambio de división.</p>';
+        html += '<p>e.&nbsp;	Separación transitoria (de 1 a 6 días)</p>';
+        html += '<p>f.&nbsp;	Separación por el resto del año calendario en curso. (Incluye el período de evaluación de diciembre)</p>';
+        html += '<p>g.&nbsp;	Separación por el resto del año escolar (Incluye el período de evaluación diciembre/febrero-marzo)</p>';
+        html += '<p>h.&nbsp;	Separación definitiva de la escuela</p>';
+        html += '<strong>El Consejo de Convivencia</strong>';
+        html += '<p>El Consejo de Convivencia de la escuela es el órgano encargado de intervenir en situaciones consideradas como faltas graves a las normas de convivencia escolar, así como en los hechos que involucren estudiantes que han cometido faltas reiteradas. El consejo está compuesto por representantes de diversos sectores de la comunidad educativa lo que permite operar en base a aportes realizados desde muy diversas perspectivas.</p>';
+        html += '<hr>';
+        html += '<input type="checkbox" id="saveNoti" name="saveNoti" onchange="javascript:Login.enaBotEnvioNoti();"><label for="saveNoti">He leído el Código de Convivencia</label>';
+        html += '</div>';
+        html += '<div class="btnPopUps"><button class="btn" id="botSbmAceptar" name="botSbmAceptar" onclick="Login.grabNotificacion('+res.user+');" type="button" value="Aceptar">Aceptar</button></div>';
+        html += '</form>';
+		return html;
+	},
+
+	cargOpcSeleccion: function(arrJer)
+	{
+		var html = Login.grafCuadSelecJer(arrJer);
+
+		if(html){
+		  finalizarCargando();
+          abrirModal(html,'html');
+		}
+			
+            
+	},
+
+	mostMsjToHomeOrToURL: function(res)
+	{
+		var html = Login.msjToHomeOrToURL(res);
+
+		if(html){
+            finalizarCargando();
+            abrirModal(html,'html');
+		}
+		
+	},
+	
+	mostMsjNotificacion: function(res)
+	{
+		var html = Login.msjNotificacion(res);
+
+		if(html)
+		{
+		    finalizarCargando();
+            abrirModal(html,'html');
+			DomGet('botSbmAceptar').disabled = true;
+		}
+	},
+
+	limpBodyPopup: function()
+	{
+		DomGet('bodyPopUpDiv').innerHTML = '';
+	},
+
+	cerrCuadSelJer: function()
+	{
+		if (YAHOO.cuadContLogin)
+		{
+			YAHOO.cuadContLogin.hide();
+		}
+        iniciarCargando('Iniciando Sesión...');
+		YAHOO.util.Connect.asyncRequest('POST', '/ajaxactions/DeleteCookieAutoLogin', null, null);
+	},
+
+	grabSelJer: function(formul)
+	{
+		Login.disBotEnvio();
+
+		var h = 0;
+		var i;
+
+		for(i = 0; i < formul.opcJer.length; i++ )
+		{
+			if(formul.opcJer[i].checked)
+			{
+				h = formul.opcJer[i].value;
+				break;
+			}
+		}
+
+		if(h > 0)
+		{
+			var callback =
+			{
+				success: function(o)
+				{
+
+					var jsn = false;
+
+					if(o.responseText != '')
+					{
+						try
+						{
+							jsn = YAHOO.lang.JSON.parse(o.responseText);
+						}
+						catch(e)
+						{
+							jsn = false;
+						}
+					}
+					if(jsn)
+					{
+						switch(jsn[0])
+						{
+							case 1:
+								window.location = jsn[1];
+								break;
+
+							default:
+								finalizarCargando();
+								abrirDialogo('Se produjo un error. <a href="javascript: location.reload();">Recargue la página</a> e intentelo otra vez', 'error');
+								break;
+						}
+					}
+					else
+					{
+						finalizarCargando();
+						abrirDialogo('Se produjo un error. <a href="javascript: location.reload();">Recargue la página</a> e intentelo otra vez', 'error');
+					}
+				},
+
+				failure: function(o)
+				{
+					finalizarCargando();
+					abrirDialogo('Se produjo un error. <a href="javascript: location.reload();">Recargue la página</a> e intentelo otra vez', 'error');
+				}
+			}
+
+			YAHOO.util.Connect.asyncRequest('POST', '/ajaxactions/AsignarJerarquiaUsuario', callback, 'j=' + h + '&r=' + (Login.urlReferer != '/' ? Login.urlReferer : '') + '&saveDefault=' + formul.saveDefault.checked);
+		}
+		else
+		{
+			Login.mostMsjErr('Debe seleccionar una Jerarquia');
+			Login.enaBotEnvio();
+		}
+	},
+
+	forceOpcToHomeOrToURL: function(formul, opc)
+	{
+		for(var i = 0; i < formul.opc.length; i++ )
+		{
+			formul.opc[i].checked = false;
+		}
+		
+		opc.checked = true;
+
+		Login.grabOpcToHomeOrToURL(formul);
+	},
+	grabOpcToHomeOrToURL: function(formul)
+	{
+		Login.disBotEnvio();
+		var guardaPaginaPersonal = formul.saveDefault.checked;
+		var h = false;
+		var i;
+
+		for(i = 0; i < formul.opc.length; i++ )
+		{
+			if(formul.opc[i].checked)
+			{
+				h = formul.opc[i].value;
+				break;
+			}
+		}
+
+		if(h)
+		{
+			var c = (h == 'home' ? 'home' : 'referrer');
+			
+			Login.mostMsjCarga();
+			
+			if(guardaPaginaPersonal == true)
+			{
+				var callback =
+				{
+					success: function(o)
+					{
+						window.location = (c == 'home' ? formul.homeUrl.value : h);
+					},
+					failure: function(o)
+					{
+						window.location = formul.homeUrl.value;
+					}
+				};
+
+				YAHOO.util.Connect.asyncRequest('POST', '/ajaxactions/GuardarLoginDefault', callback, 'opt=' + c);
+			}
+			else
+			{
+				window.location = (c == 'home' ? formul.homeUrl.value : h);
+			}
+		}
+		else
+		{
+			Login.mostMsjErr('Debe seleccionar una opción');
+			Login.enaBotEnvio();
+		}
+	},
+
+	grabNotificacion: function(user)
+	{
+			Login.mostMsjCarga();
+			var callback =
+			{
+				success: function(o)
+				{
+					Login.sendForm();
+				},
+				failure: function(o)
+				{
+					window.location = "/";
+				}
+			};
+
+			YAHOO.util.Connect.asyncRequest('POST', '/ajaxactions/GuardarNotificacion', callback, 'user=' + user);
+			
+			
+	},
+	
+	mostMsjCarga: function(msjErr)
+	{
+	  iniciarCargando('Ingresando al Campus ...');
+    },
+
+	mostMsjUsuarioInv: function(cod)
+	{
+		finalizarCargando();
+		abrirDialogo('Usuario y/o contraseña no v&aacute;lidos', 'error', cod, '$(\'#modalLogin\').openModal();');
+	},
+
+	mostMsjNoJerPrincp: function()
+	{
+		finalizarCargando();
+		abrirDialogo('Su Usuario no posee una Jerarquia principal.</p><p>Contáctese con el <a href="/contacto/">Administrador</a>.<p>COD.CVJ</p>', 'warning');
+	},
+
+	mostMsjErrPers: function(txt, cerrarLink, but)
+	{
+		finalizarCargando();
+		var center;
+		if(cerrarLink == undefined)
+			cerrarLink = 'Login.cerrCuadSelJer();';
+		else
+			cerrarLink = 'location.href=\''+cerrarLink+'\'';
+		if(but == undefined){
+			but = '';
+			center = false;
+		}else{
+			cerrarLink += '" class="ult';
+			center = true;
+		}
+		console.log(txt);
+		abrirDialogo('<div class="msjPopUps" style="color: black;">'+txt+'</div>'+but , 'info','', cerrarLink);
+	},
+
+	mostMsjErr: function(msjErr)
+	{
+		finalizarCargando();
+		DomGet('contMsjErr').innerHTML = msjErr;
+	},
+
+	ocultMsjErr: function(msjErr)
+	{
+		DomGet('contMsjErr').innerHTML = '';
+	},
+
+	dimensVentana: function()
+	{
+		var xScroll, yScroll;
+
+		if (window.innerHeight && window.scrollMaxY) {
+			xScroll = window.innerWidth + window.scrollMaxX;
+			yScroll = window.innerHeight + window.scrollMaxY;
+		} else if (document.body.scrollHeight > document.body.offsetHeight){ // all but Explorer Mac
+			xScroll = document.body.scrollWidth;
+			yScroll = document.body.scrollHeight;
+		} else { // Explorer Mac...would also work in Explorer 6 Strict, Mozilla and Safari
+			xScroll = document.body.offsetWidth;
+			yScroll = document.body.offsetHeight;
+		}
+
+		var windowWidth, windowHeight;
+
+		if (self.innerHeight) {	// all except Explorer
+			if(document.documentElement.clientWidth){
+				windowWidth = document.documentElement.clientWidth;
+			} else {
+				windowWidth = self.innerWidth;
+			}
+			windowHeight = self.innerHeight;
+		} else if (document.documentElement && document.documentElement.clientHeight) { // Explorer 6 Strict Mode
+			windowWidth = document.documentElement.clientWidth;
+			windowHeight = document.documentElement.clientHeight;
+		} else if (document.body) { // other Explorers
+			windowWidth = document.body.clientWidth;
+			windowHeight = document.body.clientHeight;
+		}
+
+		// for small pages with total height less then height of the viewport
+		if(yScroll < windowHeight){
+			pageHeight = windowHeight;
+		} else {
+			pageHeight = yScroll;
+		}
+
+		// for small pages with total width less then width of the viewport
+		if(xScroll < windowWidth){
+			pageWidth = xScroll;
+		} else {
+			pageWidth = windowWidth;
+		}
+
+		arrayPageSize = new Array(pageWidth,pageHeight,windowWidth,windowHeight)
+		return arrayPageSize;
+	},
+	
+	enaBotEnvio: function()
+	{
+		DomGet('botSbmSelJer').disabled = false;
+	},
+	
+	enaBotEnvioNoti: function()
+	{
+		if ($('#saveNoti').is(':checked')) {
+			DomGet('botSbmAceptar').disabled = false;
+        }
+		else{
+			DomGet('botSbmAceptar').disabled = true;
+		}	
+	},
+
+	disBotEnvio: function()
+	{
+		DomGet('botSbmSelJer').disabled = true;
+	},
+	disBotEnvioNoti: function()
+	{
+		//DomGet('botSbmAceptar').disabled = true;
+	}
+}
