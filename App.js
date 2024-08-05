@@ -12,9 +12,9 @@ function ScreenA1() {
   const navigation = useNavigation();
   return (
     <View style={styles.homeScreen}>
-      <Text style={styles.text}>HOME</Text>
+      <Text style={styles.text}>MACHO'S FOOD</Text>
       <Text style={styles.description}>
-        Primer Stack - Primer Screen
+        Bienvenidos a nustra app
         {'\n\n'}
         Boton para navegar a ScreenA2
         {'\n'}
@@ -30,7 +30,7 @@ function ScreenA2() {
   const navigation = useNavigation();
   return (
     <View style={styles.homeScreen}>
-      <Text style={styles.text}>HOME - ALGO</Text>
+      <Text style={styles.text}>HOLA - ALGO</Text>
       <Text style={styles.description}>
         Primer Stack - Segunda Screen
         {'\n\n'}
@@ -141,7 +141,7 @@ function ScreenC2() {
 function ScreenD1() {
   const navigation = useNavigation();
   return (
-    <View style={styles.perfilScreen}>
+    <View style={styles.MenuScreen}>
       <Text style={styles.text}>PERFIL</Text>
       <Text style={styles.description}>
         Tercer Stack - Primer Screen
@@ -157,7 +157,7 @@ function ScreenD1() {
 function ScreenD2() {
   const navigation = useNavigation();
   return (
-    <View style={styles.perfilScreen}>
+    <View style={styles.MenuScreen}>
       <Text style={styles.text}>PERFIL - EDICION</Text>
       
       <Text style={styles.label}>Name</Text>
@@ -345,6 +345,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center', 
     alignItems: 'center', 
     backgroundColor:'#ff0000' 
+  }, 
+  MenuScreen: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    backgroundColor:'yellow' 
   },
   
   searchScreen: { 
